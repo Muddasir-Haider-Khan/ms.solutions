@@ -79,21 +79,13 @@ export default async function StoreLayout({
             >
               <ShoppingCart className="size-5" />
             </Link>
-            {isAdmin ? (
+            {isAdmin && (
               <Link
                 href="/dashboard"
                 className="hidden sm:flex h-8 items-center gap-1.5 rounded-lg bg-primary/10 px-3 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
               >
                 <LayoutDashboard className="size-3.5" />
                 Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden sm:flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                <User className="size-3.5" />
-                Login
               </Link>
             )}
           </div>
