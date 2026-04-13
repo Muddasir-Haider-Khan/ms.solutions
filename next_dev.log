@@ -1,0 +1,752 @@
+
+> multi-solutions-ims@1.0.0 dev
+> next dev
+
+▲ Next.js 16.2.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.22:3000
+- Environments: .env
+✓ Ready in 499ms
+
+(node:20957) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /login 307 in 1119ms (next.js: 261ms, application-code: 857ms)
+ GET /dashboard 200 in 4.1s (next.js: 55ms, application-code: 4.0s)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/dashboard" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="geist_a715...">
+                          <body
++                           className="min-h-full flex flex-col"
+-                           className="min-h-full flex flex-col antigravity-scroll-lock"
+                          >
+                  ...
+ 
+ GET /login?logout=true 307 in 477ms (next.js: 12ms, application-code: 465ms)
+ GET /dashboard 200 in 3.1s (next.js: 6ms, application-code: 3.1s)
+ GET /login 307 in 493ms (next.js: 8ms, application-code: 485ms)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/[root-of-the-server]__0.sy4bi._.js:221:144
+
+  218 ;
+  219 async function DashboardPage() {
+  220     const [totalProducts, stockValueData, lowStockProducts, outOfStockProducts, totalOrders, recentOrders, recentInvoices, totalSales] = await Promise.all([
+→ 221         {imported module ./src/lib/prisma.ts}["prisma"].product.count(
+
+    at <unknown> (src/app/(admin)/dashboard/page.tsx:17:20)
+    at async DashboardPage (src/app/(admin)/dashboard/page.tsx:16:7)
+  15 |     totalSales,
+  16 |   ] = await Promise.all([
+> 17 |     prisma.product.count({ where: { status: "ACTIVE" } }),
+     |                    ^
+  18 |     prisma.product.findMany({
+  19 |       where: { status: "ACTIVE" },
+  20 |       select: { costPrice: true, quantityInStock: true }, {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '348580426'
+}
+ GET /dashboard 500 in 1395ms (next.js: 10ms, application-code: 1385ms)
+[browser] Uncaught PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/[root-of-the-server]__0.sy4bi._.js:221:144
+
+  218 ;
+  219 async function DashboardPage() {
+  220     const [totalProducts, stockValueData, lowStockProducts, outOfStockProducts, totalOrders, recentOrders, recentInvoices, totalSales] = await Promise.all([
+→ 221         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count(
+
+    at <unknown> (src/app/(admin)/dashboard/page.tsx:17:20)
+    at Function.all (<anonymous>:1:21)
+    at DashboardPage (src/app/(admin)/dashboard/page.tsx:16:7)
+  15 |     totalSales,
+  16 |   ] = await Promise.all([
+> 17 |     prisma.product.count({ where: { status: "ACTIVE" } }),
+     |                    ^
+  18 |     prisma.product.findMany({
+  19 |       where: { status: "ACTIVE" },
+  20 |       select: { costPrice: true, quantityInStock: true },
+ GET /login 307 in 177ms (next.js: 7ms, application-code: 171ms)
+ GET /dashboard 200 in 2.6s (next.js: 3ms, application-code: 2.6s)
+ GET /api/auth/signout 200 in 2.0s (next.js: 1900ms, application-code: 102ms)
+ POST /api/auth/signout 302 in 162ms (next.js: 120ms, application-code: 42ms)
+ GET /login 200 in 253ms (next.js: 10ms, application-code: 244ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/login" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="geist_a715...">
+                          <body
++                           className="min-h-full flex flex-col"
+-                           className="min-h-full flex flex-col antigravity-scroll-lock"
+                          >
+                  ...
+ 
+ GET /login 200 in 248ms (next.js: 9ms, application-code: 239ms)
+ GET /api/auth/providers 200 in 205ms (next.js: 169ms, application-code: 36ms)
+ GET /api/auth/csrf 200 in 39ms (next.js: 11ms, application-code: 28ms)
+ POST /api/auth/callback/credentials 200 in 1926ms (next.js: 9ms, application-code: 1918ms)
+ GET /api/auth/session 200 in 143ms (next.js: 104ms, application-code: 39ms)
+ GET /dashboard 200 in 2.4s (next.js: 8ms, application-code: 2.4s)
+ GET /dashboard 200 in 3.6s (next.js: 16ms, application-code: 3.6s)
+○ Compiling /settings ...
+ GET /settings 200 in 11.4s (next.js: 7.7s, application-code: 3.7s)
+ GET /shop 200 in 4.9s (next.js: 162ms, application-code: 4.8s)
+ POST /shop 200 in 3.3s (next.js: 11ms, application-code: 3.3s)
+  └─ ƒ addToCart({"productId":"cmnswgaw3000fap9k5lqa839l","quantity":1}) in 1612ms src/actions/store.ts
+○ Compiling /cart ...
+ GET /cart 200 in 7.5s (next.js: 3.5s, application-code: 4.0s)
+ GET /api/auth/csrf 200 in 332ms (next.js: 237ms, application-code: 95ms)
+ POST /api/auth/signout 200 in 40ms (next.js: 4ms, application-code: 35ms)
+ GET / 200 in 4.2s (next.js: 128ms, application-code: 4.0s)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?26:401:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?28:425:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?53:981:276) 
+ GET /cart 200 in 184ms (next.js: 5ms, application-code: 179ms)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?87:85:263)
+    at CartPage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?30:461:272) 
+ GET /shop 200 in 2.6s (next.js: 19ms, application-code: 2.6s)
+ GET /cart 200 in 141ms (next.js: 27ms, application-code: 114ms)
+ GET /cart 200 in 63ms (next.js: 25ms, application-code: 38ms)
+ GET /cart 200 in 184ms (next.js: 14ms, application-code: 170ms)
+ GET /shop 200 in 3.0s (next.js: 10ms, application-code: 3.0s)
+ GET /cart 200 in 122ms (next.js: 11ms, application-code: 111ms)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?100:85:263)
+    at CartPage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?91:461:272) 
+ GET /customer-login 200 in 459ms (next.js: 351ms, application-code: 108ms)
+ GET /api/auth/providers 200 in 258ms (next.js: 201ms, application-code: 56ms)
+ GET /api/auth/csrf 200 in 58ms (next.js: 12ms, application-code: 46ms)
+ POST /api/auth/callback/credentials 401 in 1707ms (next.js: 9ms, application-code: 1698ms)
+ GET /signup 200 in 378ms (next.js: 303ms, application-code: 75ms)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].user.findUnique()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/[root-of-the-server]__0fnpm3d._.js:98:164
+
+  95 }
+  96 const validated = parsed.data;
+  97 // 2. Check if email already exists
+→ 98 const existingUser = await {imported module ./src/lib/prisma.ts}["prisma"].user.findUnique(
+
+    at <unknown> (src/actions/auth-store.ts:72:42)
+    at async signupCustomer (src/actions/auth-store.ts:72:24)
+  70 |
+  71 |   // 2. Check if email already exists
+> 72 |   const existingUser = await prisma.user.findUnique({
+     |                                          ^
+  73 |     where: { email: validated.email },
+  74 |   });
+  75 | {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'User' },
+  clientVersion: '7.7.0',
+  digest: '3662598295'
+}
+ POST /signup 500 in 3.4s (next.js: 8ms, application-code: 3.4s)
+  └─ ƒ signupCustomer({"confirmPassword":"Customer@123","email":"test@customer.com","name":"Test Customer","...":"2 items not stringified"}) in 1754ms src/actions/auth-store.ts
+ GET /customer-login 200 in 180ms (next.js: 16ms, application-code: 165ms)
+ GET /api/auth/providers 200 in 276ms (next.js: 218ms, application-code: 58ms)
+ GET /api/auth/csrf 200 in 25ms (next.js: 11ms, application-code: 14ms)
+ POST /api/auth/callback/credentials 401 in 2.3s (next.js: 10ms, application-code: 2.3s)
+ GET /signup 200 in 151ms (next.js: 7ms, application-code: 144ms)
+ POST /signup 200 in 113ms (next.js: 20ms, application-code: 93ms)
+  └─ ƒ signupCustomer({"confirmPassword":"Customer@123","email":"test2@customer.com","name":"Test Two","...":"2 items not stringified"}) in 6ms src/actions/auth-store.ts
+ POST /signup 200 in 43ms (next.js: 5ms, application-code: 38ms)
+  └─ ƒ signupCustomer({"confirmPassword":"Customer@123","email":"test2@customer.com","name":"Test Two","...":"2 items not stringified"}) in 2ms src/actions/auth-store.ts
+ POST /signup 200 in 45ms (next.js: 11ms, application-code: 34ms)
+  └─ ƒ signupCustomer({"confirmPassword":"Customer@123","email":"test2@customer.com","name":"Test Two","...":"2 items not stringified"}) in 1ms src/actions/auth-store.ts
+ POST /signup 200 in 7.0s (next.js: 9ms, application-code: 7.0s)
+  └─ ƒ signupCustomer({"confirmPassword":"Customer@123","email":"test2@customer.com","name":"Test Two","...":"2 items not stringified"}) in 6940ms src/actions/auth-store.ts
+ GET /api/auth/providers 200 in 165ms (next.js: 131ms, application-code: 34ms)
+ GET /api/auth/csrf 200 in 26ms (next.js: 7ms, application-code: 19ms)
+ POST /api/auth/callback/credentials 200 in 926ms (next.js: 7ms, application-code: 919ms)
+ GET / 200 in 2.1s (next.js: 6ms, application-code: 2.1s)
+ GET / 200 in 2.0s (next.js: 8ms, application-code: 2.0s)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?100:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?144:401:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?100:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?146:425:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?100:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?223:981:276) 
+ GET /shop 200 in 4.1s (next.js: 15ms, application-code: 4.1s)
+ GET /shop 200 in 78ms (next.js: 21ms, application-code: 57ms)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0~hm97u._.js:200:144
+
+  197     createdAt: "desc"
+  198 };
+  199 const [products, total] = await Promise.all([
+→ 200     {imported module ./src/lib/prisma.ts}["prisma"].product.findMany(
+
+    at <unknown> (src/actions/store.ts:154:20)
+    at async getStoreProducts (src/actions/store.ts:153:29)
+    at async ShopPage (src/app/(store)/shop/page.tsx:26:69)
+  152 |
+  153 |   const [products, total] = await Promise.all([
+> 154 |     prisma.product.findMany({
+      |                    ^
+  155 |       where,
+  156 |       select: {
+  157 |         id: true, {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '4209601234'
+}
+ GET /shop 200 in 1501ms (next.js: 13ms, application-code: 1488ms)
+[browser] Uncaught PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0~hm97u._.js:200:144
+
+  197     createdAt: "desc"
+  198 };
+  199 const [products, total] = await Promise.all([
+→ 200     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+
+    at <unknown> (src/actions/store.ts:154:20)
+    at Function.all (<anonymous>:1:21)
+    at getStoreProducts (src/actions/store.ts:153:29)
+    at Function.all (<anonymous>:1:21)
+    at ShopPage (src/app/(store)/shop/page.tsx:26:69)
+  152 |
+  153 |   const [products, total] = await Promise.all([
+> 154 |     prisma.product.findMany({
+      |                    ^
+  155 |       where,
+  156 |       select: {
+  157 |         id: true,
+ GET /shop? 200 in 3.0s (next.js: 7ms, application-code: 3.0s)
+ GET /shop?category=cmnswfy5v0002ap9ksqpmkk5l 200 in 3.5s (next.js: 8ms, application-code: 3.5s)
+ GET /admin/products 404 in 204ms (next.js: 142ms, application-code: 62ms)
+ GET /admin/inventory 404 in 61ms (next.js: 5ms, application-code: 55ms)
+ GET / 200 in 1953ms (next.js: 6ms, application-code: 1947ms)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?110:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?28:401:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?110:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?30:425:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?110:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?55:981:276) 
+ GET /api/auth/csrf 200 in 296ms (next.js: 241ms, application-code: 55ms)
+ POST /api/auth/signout 200 in 53ms (next.js: 16ms, application-code: 37ms)
+ GET / 200 in 2.5s (next.js: 23ms, application-code: 2.5s)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?26:401:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?28:425:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?53:981:276) 
+ GET /admin-login 404 in 56ms (next.js: 6ms, application-code: 50ms)
+ GET /login 200 in 81ms (next.js: 5ms, application-code: 76ms)
+ GET /api/auth/providers 200 in 197ms (next.js: 155ms, application-code: 42ms)
+ GET /api/auth/csrf 200 in 27ms (next.js: 4ms, application-code: 23ms)
+ POST /api/auth/callback/credentials 200 in 3.6s (next.js: 14ms, application-code: 3.5s)
+ GET /api/auth/session 200 in 179ms (next.js: 140ms, application-code: 39ms)
+ GET /dashboard 200 in 2.2s (next.js: 14ms, application-code: 2.2s)
+ GET /dashboard 200 in 2.7s (next.js: 12ms, application-code: 2.7s)
+ GET /products 200 in 3.4s (next.js: 343ms, application-code: 3.1s)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?69:85:263)
+    at ProductsPage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0u~8.no._.js?68:206:272) 
+ GET /products 200 in 1413ms (next.js: 14ms, application-code: 1399ms)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:778:144
+
+  775     skip,
+  776     take: limit
+  777 }),
+→ 778 {imported module ./src/lib/prisma.ts}["prisma"].product.count(
+
+    at <unknown> (src/actions/products.ts:165:20)
+    at async getProducts (src/actions/products.ts:150:29)
+  163 |       take: limit,
+  164 |     }),
+> 165 |     prisma.product.count({ where }),
+      |                    ^
+  166 |   ]);
+  167 |
+  168 |   return { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '2103599653'
+}
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     {imported module ./src/lib/prisma.ts}["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at async getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '3243188549'
+}
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     {imported module ./src/lib/prisma.ts}["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at async getCategories (src/actions/categories.ts:160:31)
+    at async ProductsPage (src/app/(admin)/products/page.tsx:16:30)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Category' },
+  clientVersion: '7.7.0',
+  digest: '2400298693'
+}
+ POST /products 500 in 5.0s (next.js: 194ms, application-code: 4.8s)
+  └─ ƒ getProducts({"limit":20,"page":1}) in 1124ms src/actions/products.ts
+ POST /products 500 in 4.9s (next.js: 283ms, application-code: 4.7s)
+  └─ ƒ getProducts({"limit":20,"page":1}) in 3221ms src/actions/products.ts
+ GET /products 200 in 4.9s (next.js: 300ms, application-code: 4.6s)
+[browser] ⨯ unhandledRejection: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:778:144
+
+  775     skip,
+  776     take: limit
+  777 }),
+→ 778 __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count(
+
+    at <unknown> (src/actions/products.ts:165:20)
+    at  getProducts (src/actions/products.ts:150:29)
+  163 |       take: limit,
+  164 |     }),
+> 165 |     prisma.product.count({ where }),
+      |                    ^
+  166 |   ]);
+  167 |
+  168 |   return {
+[browser] ⨯ unhandledRejection: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at  getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: {
+[browser] Uncaught PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at Function.all (<anonymous>:1:21)
+    at getCategories (src/actions/categories.ts:160:31)
+    at Function.all (<anonymous>:1:21)
+    at ProductsPage (src/app/(admin)/products/page.tsx:16:30)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: {
+ GET /products? 200 in 4.0s (next.js: 12ms, application-code: 4.0s)
+ GET /products 200 in 63ms (next.js: 17ms, application-code: 46ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/products" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="geist_a715...">
+                          <body
++                           className="min-h-full flex flex-col"
+-                           className="min-h-full flex flex-col antigravity-scroll-lock"
+                          >
+                  ...
+ 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?31:85:263)
+    at ProductsPage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0u~8.no._.js?16:206:272) 
+ GET /products 200 in 885ms (next.js: 15ms, application-code: 870ms)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     {imported module ./src/lib/prisma.ts}["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at async getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '3243188549'
+}
+ POST /products 500 in 2.5s (next.js: 19ms, application-code: 2.5s)
+  └─ ƒ getProducts({"limit":20,"page":1}) in 818ms src/actions/products.ts
+[browser] ⨯ unhandledRejection: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at  getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: {
+○ Compiling /products/new ...
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     {imported module ./src/lib/prisma.ts}["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at async getCategories (src/actions/categories.ts:160:31)
+    at async NewProductPage (src/app/(admin)/products/new/page.tsx:5:28)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Category' },
+  clientVersion: '7.7.0',
+  digest: '3367774211'
+}
+ GET /products/new 200 in 9.3s (next.js: 8.0s, application-code: 1222ms)
+[browser] Uncaught PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at Function.all (<anonymous>:1:21)
+    at getCategories (src/actions/categories.ts:160:31)
+    at NewProductPage (src/app/(admin)/products/new/page.tsx:5:28)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: {
+ GET /products 200 in 3.4s (next.js: 4ms, application-code: 3.4s)
+ GET /products 200 in 45ms (next.js: 7ms, application-code: 38ms)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?31:85:263)
+    at ProductsPage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0u~8.no._.js?16:206:272) 
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     {imported module ./src/lib/prisma.ts}["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at async getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '3243188549'
+}
+ POST /products 500 in 2.6s (next.js: 126ms, application-code: 2.4s)
+  └─ ƒ getProducts({"limit":20,"page":1}) in 814ms src/actions/products.ts
+ GET /products 200 in 2.6s (next.js: 17ms, application-code: 2.6s)
+[browser] ⨯ unhandledRejection: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:757:144
+
+  754     ];
+  755 }
+  756 const [products, total] = await Promise.all([
+→ 757     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+
+    at <unknown> (src/actions/products.ts:151:20)
+    at  getProducts (src/actions/products.ts:150:29)
+  149 |
+  150 |   const [products, total] = await Promise.all([
+> 151 |     prisma.product.findMany({
+      |                    ^
+  152 |       where,
+  153 |       include: {
+  154 |         category: {
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     {imported module ./src/lib/prisma.ts}["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at async getCategories (src/actions/categories.ts:160:31)
+    at async ProductsPage (src/app/(admin)/products/page.tsx:16:30)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Category' },
+  clientVersion: '7.7.0',
+  digest: '2400298693'
+}
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:778:144
+
+  775     skip,
+  776     take: limit
+  777 }),
+→ 778 {imported module ./src/lib/prisma.ts}["prisma"].product.count(
+
+    at <unknown> (src/actions/products.ts:165:20)
+    at async getProducts (src/actions/products.ts:150:29)
+  163 |       take: limit,
+  164 |     }),
+> 165 |     prisma.product.count({ where }),
+      |                    ^
+  166 |   ]);
+  167 |
+  168 |   return { {
+  code: 'ETIMEDOUT',
+  meta: { modelName: 'Product' },
+  clientVersion: '7.7.0',
+  digest: '34851876'
+}
+ GET /products?search=CCTV+Camera 200 in 4.4s (next.js: 49ms, application-code: 4.4s)
+ POST /products?search=CCTV+Camera 500 in 3.9s (next.js: 17ms, application-code: 3.9s)
+  └─ ƒ getProducts({"limit":20,"page":1,"search":"CCTV Camera"}) in 1369ms src/actions/products.ts
+[browser] ⨯ unhandledRejection: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:778:144
+
+  775     skip,
+  776     take: limit
+  777 }),
+→ 778 __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].product.count(
+
+    at <unknown> (src/actions/products.ts:165:20)
+    at  getProducts (src/actions/products.ts:150:29)
+  163 |       take: limit,
+  164 |     }),
+> 165 |     prisma.product.count({ where }),
+      |                    ^
+  166 |   ]);
+  167 |
+  168 |   return {
+[browser] Uncaught PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count()` invocation in
+/home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/_0f7fhiz._.js:187:145
+
+  184     }
+  185 }
+  186 const [total, categories] = await Promise.all([
+→ 187     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].category.count(
+
+    at <unknown> (src/actions/categories.ts:161:21)
+    at Function.all (<anonymous>:1:21)
+    at getCategories (src/actions/categories.ts:160:31)
+    at Function.all (<anonymous>:1:21)
+    at ProductsPage (src/app/(admin)/products/page.tsx:16:30)
+  159 |
+  160 |   const [total, categories] = await Promise.all([
+> 161 |     prisma.category.count({ where }),
+      |                     ^
+  162 |     prisma.category.findMany({
+  163 |       where,
+  164 |       include: {
+ GET / 200 in 3.9s (next.js: 16ms, application-code: 3.9s)
+ GET /api/auth/csrf 200 in 260ms (next.js: 186ms, application-code: 74ms)
+ POST /api/auth/signout 200 in 51ms (next.js: 21ms, application-code: 30ms)
+ GET / 200 in 3.5s (next.js: 9ms, application-code: 3.5s)
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?26:401:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?28:425:292) 
+[browser] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0~tpa.2._.js?108:85:263)
+    at StoreHomePage (about://React/Server/file:///home/mhk/PROJECTS/Multi-Solutions/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0axr6si._.js?53:981:276) 
+ GET /signup 200 in 139ms (next.js: 15ms, application-code: 124ms)
+ POST /signup 200 in 5.1s (next.js: 7ms, application-code: 5.1s)
+  └─ ƒ signupCustomer({"confirmPassword":"Password123!","email":"testcustomer3@example.com","name":"Test Customer","...":"2 items not stringified"}) in 5098ms src/actions/auth-store.ts
+ GET /api/auth/providers 200 in 133ms (next.js: 118ms, application-code: 15ms)
+ GET /api/auth/csrf 200 in 25ms (next.js: 7ms, application-code: 18ms)
+ POST /api/auth/callback/credentials 200 in 1045ms (next.js: 8ms, application-code: 1038ms)
+ GET / 200 in 2.1s (next.js: 8ms, application-code: 2.1s)
+ GET / 200 in 2.0s (next.js: 14ms, application-code: 2.0s)

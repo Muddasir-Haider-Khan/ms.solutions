@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { Package, ShoppingCart, Menu, X, User, Phone, Mail, MapPin, LayoutDashboard } from "lucide-react";
+import { Package, ShoppingCart, Phone, Mail, MapPin, LayoutDashboard, ClipboardList } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { AuthButtons } from "@/components/store/auth-buttons";
+import { GuestCartProvider } from "@/lib/guest-cart";
 
 export default async function StoreLayout({
   children,
@@ -11,7 +13,18 @@ export default async function StoreLayout({
 }) {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user && ["SUPER_ADMIN", "ADMIN", "STAFF"].includes((session.user as any).role);
+
+  // Build a serializable user object for the client component
+  const authUser = session?.user
+    ? {
+        name: session.user.name || "Customer",
+        email: session.user.email || "",
+        role: (session.user as { role: string }).role || "CUSTOMER",
+      }
+    : null;
+
   return (
+    <GuestCartProvider>
     <div className="flex min-h-screen flex-col bg-background">
       {/* Top announcement bar */}
       <div className="bg-primary text-primary-foreground">
@@ -69,6 +82,15 @@ export default async function StoreLayout({
             >
               Cart
             </Link>
+            {session?.user && (
+              <Link
+                href="/account/orders"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ClipboardList className="size-3.5" />
+                My Orders
+              </Link>
+            )}
           </nav>
 
           {/* Right side actions */}
@@ -88,6 +110,7 @@ export default async function StoreLayout({
                 Dashboard
               </Link>
             )}
+            <AuthButtons user={authUser} />
           </div>
         </div>
       </header>
@@ -193,5 +216,6 @@ export default async function StoreLayout({
 
       <Toaster richColors position="top-right" />
     </div>
+    </GuestCartProvider>
   );
 }

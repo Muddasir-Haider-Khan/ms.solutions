@@ -36,6 +36,8 @@ import {
 import { addToCart } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
 import { toast } from "sonner";
+import { Slider } from "@/components/ui/slider";
+import { useGuestCart } from "@/lib/guest-cart";
 
 type Product = {
   id: string;
@@ -80,6 +82,7 @@ export function ShopClient({
   currentMinPrice,
   currentMaxPrice,
   currentSort,
+  isAuthenticated = false,
 }: {
   products: ProductsData | null;
   categories: Category[];
@@ -90,13 +93,21 @@ export function ShopClient({
   currentMinPrice: string;
   currentMaxPrice: string;
   currentSort: string;
+  isAuthenticated?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const guestCart = useGuestCart();
   const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState(currentSearch);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
+
+  // Local state for price filter to prevent layout thrashing on every keystroke
+  const initialMin = currentMinPrice ? parseInt(currentMinPrice, 10) : 0;
+  const initialMax = currentMaxPrice ? parseInt(currentMaxPrice, 10) : 50000;
+  const [localPriceParams, setLocalPriceParams] = useState({ min: currentMinPrice, max: currentMaxPrice });
+  const [sliderValue, setSliderValue] = useState<[number, number]>([initialMin, initialMax]);
 
   const currentPage = products?.pagination?.page ?? 1;
   const totalPages = products?.pagination?.totalPages ?? 1;
@@ -147,13 +158,33 @@ export function ShopClient({
   }
 
   function handlePriceFilter() {
-    updateFilters({ minPrice: currentMinPrice, maxPrice: currentMaxPrice });
+    updateFilters({ minPrice: localPriceParams.min, maxPrice: localPriceParams.max });
   }
 
-  async function handleAddToCart(productId: string) {
-    setAddingToCart(productId);
+  function handleSliderChange(val: [number, number]) {
+    setSliderValue(val);
+    setLocalPriceParams({ min: val[0].toString(), max: val[1].toString() });
+  }
+
+  async function handleAddToCart(product: Product) {
+    if (!isAuthenticated) {
+      // Use guest cart for unauthenticated users
+      guestCart.addItem({
+        productId: product.id,
+        quantity: 1,
+        name: product.name,
+        slug: product.slug,
+        sellingPrice: product.sellingPrice,
+        comparePrice: product.comparePrice,
+        image: product.images?.[0]?.url || null,
+        quantityInStock: product.quantityInStock,
+      });
+      toast.success("Added to cart");
+      return;
+    }
+    setAddingToCart(product.id);
     try {
-      const result = await addToCart({ productId, quantity: 1 });
+      const result = await addToCart({ productId: product.id, quantity: 1 });
       if (result.success) {
         toast.success("Added to cart");
       } else {
@@ -167,6 +198,8 @@ export function ShopClient({
   }
 
   function clearAllFilters() {
+    setLocalPriceParams({ min: "", max: "" });
+    setSliderValue([0, 50000]);
     startTransition(() => {
       router.push("/shop");
     });
@@ -205,27 +238,52 @@ export function ShopClient({
       {/* Price Range */}
       <div>
         <h3 className="mb-3 text-sm font-semibold">Price Range</h3>
-        <div className="flex items-center gap-2">
+        <div className="mb-4 space-y-4">
+          <Slider
+            min={0}
+            max={100000}
+            step={500}
+            value={sliderValue}
+            minStepsBetweenValues={1}
+            onValueChange={(val: any) => handleSliderChange(val)}
+            className="w-full"
+          />
+          <div className="flex items-center justify-between font-medium">
+            <span className="text-xs text-muted-foreground">{formatCurrency(sliderValue[0])}</span>
+            <span className="text-xs text-muted-foreground">{formatCurrency(sliderValue[1])}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mb-2">
           <Input
             type="number"
             placeholder="Min"
-            value={currentMinPrice}
-            onChange={(e) =>
-              updateFilters({ minPrice: e.target.value })
-            }
+            value={localPriceParams.min}
+            onChange={(e) => {
+              setLocalPriceParams(prev => ({ ...prev, min: e.target.value }));
+              setSliderValue([Number(e.target.value) || 0, sliderValue[1]]);
+            }}
             className="h-8 text-xs"
           />
           <span className="text-muted-foreground">-</span>
           <Input
             type="number"
             placeholder="Max"
-            value={currentMaxPrice}
-            onChange={(e) =>
-              updateFilters({ maxPrice: e.target.value })
-            }
+            value={localPriceParams.max}
+            onChange={(e) => {
+              setLocalPriceParams(prev => ({ ...prev, max: e.target.value }));
+              setSliderValue([sliderValue[0], Number(e.target.value) || 100000]);
+            }}
             className="h-8 text-xs"
           />
         </div>
+        <Button 
+          variant="secondary" 
+          size="sm" 
+          className="w-full text-xs font-semibold"
+          onClick={handlePriceFilter}
+        >
+          Apply Price Filter
+        </Button>
       </div>
 
       <Separator />
@@ -476,7 +534,7 @@ export function ShopClient({
                             size="xs"
                             className="w-full"
                             disabled={addingToCart === product.id}
-                            onClick={() => handleAddToCart(product.id)}
+                            onClick={() => handleAddToCart(product)}
                           >
                             <ShoppingCart className="size-3" />
                             {addingToCart === product.id

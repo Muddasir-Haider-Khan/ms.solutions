@@ -18,6 +18,8 @@ import { Separator } from "@/components/ui/separator";
 import { getStoreProduct, getRelatedProducts } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
 import { ProductDetailClient } from "./product-detail-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const metadata = {
   title: "Product - Multi Solutions Store",
@@ -31,9 +33,10 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
 
-  const [productResult, relatedResult] = await Promise.all([
+  const [productResult, relatedResult, session] = await Promise.all([
     getStoreProduct(slug),
     getRelatedProducts("", undefined), // We'll get related after knowing the product
+    getServerSession(authOptions),
   ]);
 
   if (!productResult.success || !productResult.data) {
@@ -212,7 +215,7 @@ export default async function ProductDetailPage({
           <Separator className="my-4" />
 
           {/* Add to Cart section - Client Component */}
-          <ProductDetailClient product={product} />
+          <ProductDetailClient product={product} isAuthenticated={!!session?.user} />
 
           {/* Trust badges */}
           <div className="mt-6 grid grid-cols-3 gap-3">

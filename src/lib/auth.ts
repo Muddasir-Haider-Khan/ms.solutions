@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
+  // No adapter needed for credentials-only + JWT strategy
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -21,6 +22,10 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.isActive) {
+          return null;
+        }
+
+        if (!user.password) {
           return null;
         }
 

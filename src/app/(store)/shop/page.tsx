@@ -1,5 +1,7 @@
 import { getStoreProducts, getStoreCategories, getStoreBrands } from "@/actions/store";
 import { ShopClient } from "@/components/store/shop-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const metadata = {
   title: "Shop - Multi Solutions Store",
@@ -21,7 +23,7 @@ export default async function ShopPage({
 }) {
   const params = await searchParams;
 
-  const [productsResult, categoriesResult, brandsResult] = await Promise.all([
+  const [productsResult, categoriesResult, brandsResult, session] = await Promise.all([
     getStoreProducts({
       search: params.search,
       categoryId: params.category,
@@ -34,6 +36,7 @@ export default async function ShopPage({
     }),
     getStoreCategories(),
     getStoreBrands(),
+    getServerSession(authOptions),
   ]);
 
   const products =
@@ -54,6 +57,8 @@ export default async function ShopPage({
       currentMinPrice={params.minPrice || ""}
       currentMaxPrice={params.maxPrice || ""}
       currentSort={params.sort || "newest"}
+      isAuthenticated={!!session?.user}
     />
   );
 }
+

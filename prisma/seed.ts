@@ -11,13 +11,13 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  const adminPassword = await bcrypt.hash("admin123", 10);
+  const adminPassword = await bcrypt.hash("Admin@12345", 10);
   const superAdmin = await prisma.user.upsert({
-    where: { email: "admin@multisolutions.com" },
+    where: { email: "admin@msmultisolution.com" },
     update: {},
     create: {
       name: "Super Admin",
-      email: "admin@multisolutions.com",
+      email: "admin@msmultisolution.com",
       password: adminPassword,
       role: Role.SUPER_ADMIN,
       isActive: true,
@@ -44,7 +44,7 @@ async function main() {
     update: {},
     create: {
       id: "company-settings-1",
-      companyName: "Multi Solutions Company",
+      companyName: "MS Multi Solution",
       address: "123 Business Avenue, Lahore, Pakistan",
       phone: "+92-300-1234567",
       email: "info@multisolutions.com",
@@ -188,7 +188,7 @@ async function main() {
   console.log("Created customers");
 
   console.log("\nSeeding completed!");
-  console.log("Login: admin@multisolutions.com / admin123");
+  console.log("Admin: admin@msmultisolution.com / Admin@12345");
   console.log("Staff: staff@multisolutions.com / staff123");
 }
 

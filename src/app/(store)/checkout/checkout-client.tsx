@@ -2,20 +2,53 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
 import { placeOrder } from "@/actions/store";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/slugs";
+
+function buildWhatsAppMessage(
+  orderNumber: string,
+  formData: Record<string, string>,
+  totalAmount: number
+) {
+  const lines = [
+    `🛒 *New Order - ${orderNumber}*`,
+    ``,
+    `👤 *Customer:* ${formData.customerName}`,
+    `📞 *Phone:* ${formData.customerPhone}`,
+    formData.customerEmail ? `📧 *Email:* ${formData.customerEmail}` : "",
+    ``,
+    `📍 *Delivery Address:*`,
+    `${formData.shippingAddress}`,
+    `${formData.shippingCity}`,
+    ``,
+    `💰 *Total:* ${formatCurrency(totalAmount)}`,
+    `💳 *Payment:* ${formData.paymentMethod === "COD" ? "Cash on Delivery" : "Bank Transfer"}`,
+    formData.notes ? `\n📝 *Notes:* ${formData.notes}` : "",
+    ``,
+    `---`,
+    `_Sent via Multi Solutions Store_`,
+  ];
+
+  return lines.filter(Boolean).join("\n");
+}
+
+function getWhatsAppUrl(phone: string, message: string) {
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+}
 
 export function CheckoutClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [whatsappLoading, setWhatsappLoading] = useState(false);
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
@@ -33,26 +66,30 @@ export function CheckoutClient() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    // Basic validation
+  function validateForm() {
     if (!formData.customerName.trim()) {
       toast.error("Please enter your name");
-      return;
+      return false;
     }
     if (!formData.customerPhone.trim()) {
       toast.error("Please enter your phone number");
-      return;
+      return false;
     }
     if (!formData.shippingAddress.trim()) {
       toast.error("Please enter your address");
-      return;
+      return false;
     }
     if (!formData.shippingCity.trim()) {
       toast.error("Please enter your city");
-      return;
+      return false;
     }
+    return true;
+  }
+
+  // Standard order placement
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     startTransition(async () => {
       const result = await placeOrder(formData);
@@ -70,6 +107,50 @@ export function CheckoutClient() {
       }
     });
   }
+
+  // WhatsApp order: save to DB first, then redirect to wa.me
+  async function handleWhatsAppOrder() {
+    if (!validateForm()) return;
+
+    setWhatsappLoading(true);
+    try {
+      const result = await placeOrder(formData);
+      if (result.success && result.data) {
+        const orderData = result.data as {
+          orderId: string;
+          orderNumber: string;
+          totalAmount: number;
+        };
+
+        // Build WhatsApp message
+        const ownerPhone = process.env.NEXT_PUBLIC_OWNER_WHATSAPP_NUMBER || "923000000000";
+        const message = buildWhatsAppMessage(
+          orderData.orderNumber,
+          formData,
+          orderData.totalAmount
+        );
+        const waUrl = getWhatsAppUrl(ownerPhone, message);
+
+        // Open WhatsApp in new tab
+        window.open(waUrl, "_blank");
+
+        // Then navigate to success page
+        router.push(
+          `/order-success?orderId=${orderData.orderId}&whatsapp=true`
+        );
+      } else {
+        toast.error(
+          (result as { error?: string }).error || "Failed to place order"
+        );
+      }
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setWhatsappLoading(false);
+    }
+  }
+
+  const isLoading = isPending || whatsappLoading;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,17 +285,51 @@ export function CheckoutClient() {
         </CardContent>
       </Card>
 
-      {/* Submit Button */}
-      <Button type="submit" size="lg" className="w-full" disabled={isPending}>
-        {isPending ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            Placing Order...
-          </>
-        ) : (
-          "Place Order"
-        )}
-      </Button>
+      {/* Submit Buttons */}
+      <div className="flex flex-col gap-3">
+        {/* WhatsApp Order — Primary CTA */}
+        <Button
+          type="button"
+          size="lg"
+          className="w-full gap-2 bg-[#25D366] text-white hover:bg-[#1da851] focus-visible:ring-[#25D366]"
+          onClick={handleWhatsAppOrder}
+          disabled={isLoading}
+        >
+          {whatsappLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Sending to WhatsApp...
+            </>
+          ) : (
+            <>
+              <MessageCircle className="size-5" />
+              Order via WhatsApp
+            </>
+          )}
+        </Button>
+
+        {/* Standard Order — Secondary CTA */}
+        <Button
+          type="submit"
+          size="lg"
+          variant="outline"
+          className="w-full"
+          disabled={isLoading}
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Placing Order...
+            </>
+          ) : (
+            "Place Order (Standard)"
+          )}
+        </Button>
+
+        <p className="text-center text-xs text-muted-foreground">
+          💬 WhatsApp order lets you confirm directly with us — fastest way to order!
+        </p>
+      </div>
     </form>
   );
 }

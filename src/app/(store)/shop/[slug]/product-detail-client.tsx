@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Minus, Plus } from "lucide-react";
+import { ShoppingCart, Minus, Plus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { addToCart } from "@/actions/store";
 import { toast } from "sonner";
+import Link from "next/link";
 
 type Product = {
   id: string;
@@ -26,7 +27,7 @@ type Product = {
   }>;
 };
 
-export function ProductDetailClient({ product }: { product: Product }) {
+export function ProductDetailClient({ product, isAuthenticated = false }: { product: Product; isAuthenticated?: boolean }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
@@ -57,6 +58,11 @@ export function ProductDetailClient({ product }: { product: Product }) {
   }
 
   async function handleAddToCart() {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to add items to your cart");
+      router.push(`/customer-login?callbackUrl=/shop/${product.slug}`);
+      return;
+    }
     startTransition(async () => {
       const result = await addToCart({
         productId: product.id,
@@ -73,6 +79,11 @@ export function ProductDetailClient({ product }: { product: Product }) {
   }
 
   async function handleBuyNow() {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to add items to your cart");
+      router.push(`/customer-login?callbackUrl=/shop/${product.slug}`);
+      return;
+    }
     startTransition(async () => {
       const result = await addToCart({
         productId: product.id,
@@ -164,26 +175,52 @@ export function ProductDetailClient({ product }: { product: Product }) {
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-3 pt-2">
-        <Button
-          size="lg"
-          className="flex-1"
-          disabled={!isInStock || isPending}
-          onClick={handleAddToCart}
-        >
-          <ShoppingCart className="size-4" />
-          {isPending ? "Adding..." : "Add to Cart"}
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="flex-1"
-          disabled={!isInStock || isPending}
-          onClick={handleBuyNow}
-        >
-          Buy Now
-        </Button>
-      </div>
+      {!isAuthenticated ? (
+        <div className="space-y-3 pt-2">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+            Please sign in to add items to your cart
+          </div>
+          <div className="flex gap-3">
+            <Button
+              size="lg"
+              className="flex-1"
+              render={<Link href={`/customer-login?callbackUrl=/shop/${product.slug}`} />}
+            >
+              <LogIn className="size-4" />
+              Sign In
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1"
+              render={<Link href="/signup" />}
+            >
+              Create Account
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-3 pt-2">
+          <Button
+            size="lg"
+            className="flex-1"
+            disabled={!isInStock || isPending}
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="size-4" />
+            {isPending ? "Adding..." : "Add to Cart"}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="flex-1"
+            disabled={!isInStock || isPending}
+            onClick={handleBuyNow}
+          >
+            Buy Now
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -383,10 +383,19 @@ export async function updateOrderStatus(id: string, status: string) {
       return { success: true as const, data: updatedOrder };
     }
 
-    // For non-cancellation status changes, simply update
+    // For non-cancellation status changes, build timestamp data
+    const timestampData: Record<string, unknown> = { status: newStatus };
+    if (newStatus === OrderStatus.CONFIRMED) {
+      timestampData.confirmedAt = new Date();
+    } else if (newStatus === OrderStatus.SHIPPED) {
+      timestampData.dispatchedAt = new Date();
+    } else if (newStatus === OrderStatus.DELIVERED) {
+      timestampData.deliveredAt = new Date();
+    }
+
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { status: newStatus },
+      data: timestampData,
       include: {
         items: true,
         customer: {
@@ -395,8 +404,8 @@ export async function updateOrderStatus(id: string, status: string) {
       },
     });
 
-    revalidatePath("/dashboard/orders");
-    revalidatePath(`/dashboard/orders/${orderId}`);
+    revalidatePath("/orders");
+    revalidatePath(`/orders/${orderId}`);
 
     return { success: true as const, data: updatedOrder };
   } catch (error) {
