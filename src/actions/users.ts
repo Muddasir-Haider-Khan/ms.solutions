@@ -473,6 +473,10 @@ export async function changePassword(
     return { success: false, error: "User not found" };
   }
 
+  if (!existing.password) {
+    return { success: false, error: "Current password is incorrect" };
+  }
+
   const isValid = await bcrypt.compare(currentPassword, existing.password);
   if (!isValid) {
     return { success: false, error: "Current password is incorrect" };
