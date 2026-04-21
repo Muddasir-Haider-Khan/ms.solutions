@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { ShoppingBag, Package, ArrowRight, ArrowLeft } from "lucide-react";
+import { ShoppingBag, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getCart } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
 import { CartClient } from "./cart-client";
+import { GuestCartView } from "./guest-cart-view";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const metadata = {
   title: "Cart - Multi Solutions Store",
@@ -12,7 +15,10 @@ export const metadata = {
 };
 
 export default async function CartPage() {
-  const cartResult = await getCart();
+  const session = await getServerSession(authOptions);
+  const isAuthenticated = !!session?.user;
+
+  const cartResult = isAuthenticated ? await getCart() : { success: false as const, data: null };
   const cart = cartResult.success ? cartResult.data : null;
 
   const cartItems = cart?.items ?? [];
@@ -21,8 +27,6 @@ export default async function CartPage() {
       item.productVariant?.sellingPrice ?? item.product.sellingPrice;
     return sum + price * item.quantity;
   }, 0);
-
-  const isEmpty = cartItems.length === 0;
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
@@ -38,36 +42,11 @@ export default async function CartPage() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
             Shopping Cart
           </h1>
-          {!isEmpty && (
-            <p className="text-sm text-gray-500">
-              {cartItems.length} item{cartItems.length !== 1 ? "s" : ""} in your
-              cart
-            </p>
-          )}
         </div>
       </div>
 
-      {isEmpty ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex size-20 items-center justify-center rounded-full bg-store-light-bg">
-            <ShoppingBag className="size-10 text-store-muted" />
-          </div>
-          <h2 className="mt-6 text-xl font-semibold text-gray-900">
-            Your cart is empty
-          </h2>
-          <p className="mt-2 max-w-sm text-sm text-gray-500">
-            Looks like you have not added anything to your cart yet. Browse our
-            products and find something you love.
-          </p>
-          <Link
-            href="/shop"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
-          >
-            Continue Shopping
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
-      ) : (
+      {/* Authenticated user with DB cart items */}
+      {isAuthenticated && cartItems.length > 0 && (
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <CartClient cartItems={cartItems} />
@@ -117,6 +96,32 @@ export default async function CartPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      )}
+
+      {/* Guest user: show client-side guest cart */}
+      {!isAuthenticated && <GuestCartView />}
+
+      {/* Empty state (authenticated with empty cart) */}
+      {isAuthenticated && cartItems.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="flex size-20 items-center justify-center rounded-full bg-store-light-bg">
+            <ShoppingBag className="size-10 text-store-muted" />
+          </div>
+          <h2 className="mt-6 text-xl font-semibold text-gray-900">
+            Your cart is empty
+          </h2>
+          <p className="mt-2 max-w-sm text-sm text-gray-500">
+            Looks like you have not added anything to your cart yet. Browse our
+            products and find something you love.
+          </p>
+          <Link
+            href="/shop"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+          >
+            Continue Shopping
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
       )}
     </div>

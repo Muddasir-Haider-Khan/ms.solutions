@@ -196,7 +196,48 @@ export async function getStoreProducts(params?: {
 }
 
 // ============================================================
-// 2. GET STORE PRODUCT (by slug)
+// 2. GET DEALS PRODUCTS (comparePrice > sellingPrice)
+// ============================================================
+
+export async function getDealsProducts(limit = 4) {
+  try {
+    // First try admin-marked deals (isDeal = true)
+    let products = await prisma.product.findMany({
+      where: { status: ProductStatus.ACTIVE, isDeal: true },
+      select: {
+        id: true, name: true, slug: true, sellingPrice: true, comparePrice: true,
+        brand: true, quantityInStock: true,
+        category: { select: { id: true, name: true, slug: true } },
+        images: { where: { sortOrder: 0 }, select: { url: true, altText: true }, take: 1 },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: limit,
+    });
+
+    // Fallback: products with comparePrice > sellingPrice
+    if (products.length === 0) {
+      const fallback = await prisma.product.findMany({
+        where: { status: ProductStatus.ACTIVE, comparePrice: { not: null } },
+        select: {
+          id: true, name: true, slug: true, sellingPrice: true, comparePrice: true,
+          brand: true, quantityInStock: true,
+          category: { select: { id: true, name: true, slug: true } },
+          images: { where: { sortOrder: 0 }, select: { url: true, altText: true }, take: 1 },
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+      });
+      products = fallback.filter((p) => p.comparePrice != null && p.comparePrice > p.sellingPrice);
+    }
+
+    return { success: true as const, data: products };
+  } catch {
+    return { success: false as const, error: "Failed to fetch deals" };
+  }
+}
+
+// ============================================================
+// 3. GET STORE PRODUCT (by slug)
 // ============================================================
 
 export async function getStoreProduct(slug: string) {

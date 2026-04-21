@@ -29,7 +29,13 @@ function buildWhatsAppMessage(
     `${formData.shippingCity}`,
     ``,
     `*Total:* ${formatCurrency(totalAmount)}`,
-    `*Payment:* ${formData.paymentMethod === "COD" ? "Cash on Delivery" : "Bank Transfer"}`,
+    `*Payment:* ${
+      formData.paymentMethod === "COD" ? "Cash on Delivery" :
+      formData.paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" :
+      formData.paymentMethod === "JAZZCASH" ? "JazzCash" :
+      formData.paymentMethod === "EASYPAISA" ? "EasyPaisa" :
+      formData.paymentMethod
+    }`,
     formData.notes ? `\n*Notes:* ${formData.notes}` : "",
     ``,
     `---`,
@@ -95,8 +101,19 @@ export function CheckoutClient() {
         const orderData = result.data as {
           orderId: string;
           orderNumber: string;
+          totalAmount: number;
         };
+
         toast.success("Order placed successfully!");
+
+        // JazzCash: redirect to payment page
+        if (formData.paymentMethod === "JAZZCASH") {
+          router.push(
+            `/jazzcash-payment?orderId=${orderData.orderId}&amount=${orderData.totalAmount}&orderNumber=${encodeURIComponent(orderData.orderNumber)}`
+          );
+          return;
+        }
+
         router.push(`/order-success?orderId=${orderData.orderId}`);
       } else {
         toast.error(
@@ -274,6 +291,28 @@ export function CheckoutClient() {
                 <p className="text-xs text-gray-500">
                   Transfer payment directly to our bank account. Order will be
                   confirmed after payment verification.
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex items-start gap-3 rounded-xl border p-4 transition-colors hover:border-store-accent/30">
+              <RadioGroupItem value="JAZZCASH" id="jazzcash" />
+              <div className="flex-1">
+                <Label htmlFor="jazzcash" className="cursor-pointer font-medium">
+                  JazzCash
+                </Label>
+                <p className="text-xs text-gray-500">
+                  Pay securely via JazzCash mobile wallet. You will be redirected to complete payment.
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex items-start gap-3 rounded-xl border p-4 transition-colors hover:border-store-accent/30">
+              <RadioGroupItem value="EASYPAISA" id="easypaisa" />
+              <div className="flex-1">
+                <Label htmlFor="easypaisa" className="cursor-pointer font-medium">
+                  EasyPaisa
+                </Label>
+                <p className="text-xs text-gray-500">
+                  Pay securely via EasyPaisa mobile wallet.
                 </p>
               </div>
             </div>

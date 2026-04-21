@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getInvoices } from "@/actions/invoices";
 import { InvoiceListClient } from "@/components/admin/invoice-list-client";
 import { formatCurrency } from "@/lib/slugs";
+import { requireAdminRole } from "@/lib/permissions";
 
 export default async function InvoicesPage() {
+  await requireAdminRole();
   const result = await getInvoices({ page: 1, limit: 100 });
 
   const invoices = result?.success && result.data ? result.data.invoices : [];

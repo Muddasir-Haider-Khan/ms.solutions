@@ -98,14 +98,19 @@
   --store-light-bg: #f5f5f5;
   --store-warm-bg: #FFF8E1;
   --store-border: #e0e0e0;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  /* Sidebar — dark teal admin theme */
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.47 0.12 172);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-accent: oklch(0.22 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.47 0.12 172);
+  /* Primary — teal for buttons/links in admin */
+  --primary: oklch(0.47 0.12 172);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.47 0.12 172);
 }
 
 .dark {
@@ -148,8 +153,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.6;
   }
   html {
     @apply font-sans;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
   }
 }

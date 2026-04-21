@@ -2,11 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Minus, Plus, LogIn } from "lucide-react";
+import { ShoppingCart, Minus, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { addToCart } from "@/actions/store";
+import { useGuestCart } from "@/lib/guest-cart";
 import { toast } from "sonner";
-import Link from "next/link";
 
 type Product = {
   id: string;
@@ -14,8 +14,10 @@ type Product = {
   slug: string;
   sku: string;
   sellingPrice: number;
+  comparePrice: number | null;
   quantityInStock: number;
   trackInventory: boolean;
+  images: { url: string; altText: string | null }[];
   variants: Array<{
     id: string;
     name: string;
@@ -34,10 +36,9 @@ export function ProductDetailClient({
   isAuthenticated?: boolean;
 }) {
   const router = useRouter();
+  const guestCart = useGuestCart();
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
-    null
-  );
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const selectedVariant = selectedVariantId
@@ -64,8 +65,20 @@ export function ProductDetailClient({
 
   async function handleAddToCart() {
     if (!isAuthenticated) {
-      toast.error("Please sign in to add items to your cart");
-      router.push(`/customer-login?callbackUrl=/shop/${product.slug}`);
+      // Use guest cart for unauthenticated users
+      guestCart.addItem({
+        productId: product.id,
+        variantId: selectedVariantId ?? undefined,
+        quantity,
+        name: product.name,
+        slug: product.slug,
+        sellingPrice: currentPrice,
+        comparePrice: product.comparePrice,
+        image: product.images?.[0]?.url ?? null,
+        quantityInStock: availableStock,
+        variantName: selectedVariant?.name ?? null,
+      });
+      toast.success(`${product.name} added to cart`);
       return;
     }
     startTransition(async () => {
@@ -85,8 +98,19 @@ export function ProductDetailClient({
 
   async function handleBuyNow() {
     if (!isAuthenticated) {
-      toast.error("Please sign in to add items to your cart");
-      router.push(`/customer-login?callbackUrl=/shop/${product.slug}`);
+      guestCart.addItem({
+        productId: product.id,
+        variantId: selectedVariantId ?? undefined,
+        quantity,
+        name: product.name,
+        slug: product.slug,
+        sellingPrice: currentPrice,
+        comparePrice: product.comparePrice,
+        image: product.images?.[0]?.url ?? null,
+        quantityInStock: availableStock,
+        variantName: selectedVariant?.name ?? null,
+      });
+      router.push("/cart");
       return;
     }
     startTransition(async () => {
@@ -176,46 +200,23 @@ export function ProductDetailClient({
       </div>
 
       {/* Action buttons */}
-      {!isAuthenticated ? (
-        <div className="space-y-3 pt-2">
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Please sign in to add items to your cart
-          </div>
-          <div className="flex gap-3">
-            <Link
-              href={`/customer-login?callbackUrl=/shop/${product.slug}`}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
-            >
-              <LogIn className="size-4" />
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100"
-            >
-              Create Account
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <div className="flex gap-3 pt-2">
-          <button
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover disabled:opacity-50"
-            disabled={!isInStock || isPending}
-            onClick={handleAddToCart}
-          >
-            <ShoppingCart className="size-4" />
-            {isPending ? "Adding..." : "Add to Cart"}
-          </button>
-          <button
-            className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-store-accent px-6 py-3 text-sm font-semibold text-store-accent transition-colors hover:bg-store-accent-light disabled:opacity-50"
-            disabled={!isInStock || isPending}
-            onClick={handleBuyNow}
-          >
-            Buy Now
-          </button>
-        </div>
-      )}
+      <div className="flex gap-3 pt-2">
+        <button
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover disabled:opacity-50"
+          disabled={!isInStock || isPending}
+          onClick={handleAddToCart}
+        >
+          <ShoppingCart className="size-4" />
+          {isPending ? "Adding..." : "Add to Cart"}
+        </button>
+        <button
+          className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-store-accent px-6 py-3 text-sm font-semibold text-store-accent transition-colors hover:bg-store-accent-light disabled:opacity-50"
+          disabled={!isInStock || isPending}
+          onClick={handleBuyNow}
+        >
+          Buy Now
+        </button>
+      </div>
     </div>
   );
 }

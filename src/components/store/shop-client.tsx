@@ -553,7 +553,7 @@ export function ShopClient({
                             </div>
                           )}
                           {product.featured && (
-                            <span className="absolute left-2.5 top-2.5 rounded-md bg-store-dark px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                            <span className="absolute left-2.5 top-2.5 rounded-md bg-store-dark px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
                               Featured
                             </span>
                           )}
@@ -566,7 +566,7 @@ export function ShopClient({
                       </Link>
                       <div className="p-3.5">
                         {product.category && (
-                          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-store-muted">
+                          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-store-muted">
                             {product.category.name}
                           </p>
                         )}
