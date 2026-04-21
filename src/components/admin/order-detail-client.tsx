@@ -152,7 +152,12 @@ export function OrderDetailClient({ order }: { order: OrderDetail }) {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" render={<Link href="/orders" />}>
+          <Button
+            variant="ghost"
+            size="icon"
+            render={<Link href="/orders" />}
+            nativeButton={false}
+          >
             <ArrowLeft className="size-4" />
           </Button>
           <div>

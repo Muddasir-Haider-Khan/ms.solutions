@@ -260,6 +260,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           variant="outline"
           size="icon"
           render={<Link href="/products" />}
+          nativeButton={false}
         >
           <ArrowLeft className="size-4" />
         </Button>
@@ -278,6 +279,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             type="button"
             variant="outline"
             render={<Link href="/products" />}
+            nativeButton={false}
           >
             Cancel
           </Button>

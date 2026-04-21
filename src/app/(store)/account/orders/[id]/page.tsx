@@ -291,6 +291,7 @@ export default async function CustomerOrderDetailPage({
             render={
               <a href={waUrl} target="_blank" rel="noopener noreferrer" />
             }
+            nativeButton={false}
           >
             <MessageCircle className="size-4" />
             Contact on WhatsApp
@@ -299,6 +300,7 @@ export default async function CustomerOrderDetailPage({
             variant="outline"
             className="flex-1 gap-2"
             render={<Link href="/shop" />}
+            nativeButton={false}
           >
             Continue Shopping
           </Button>

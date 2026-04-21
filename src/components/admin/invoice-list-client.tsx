@@ -269,6 +269,7 @@ export function InvoiceListClient({ initialInvoices }: InvoiceListClientProps) {
                         variant="outline"
                         size="sm"
                         render={<Link href="/invoices/new" />}
+                        nativeButton={false}
                       >
                         Create your first invoice
                       </Button>
@@ -320,6 +321,7 @@ export function InvoiceListClient({ initialInvoices }: InvoiceListClientProps) {
                           render={
                             <Link href={`/invoices/${invoice.id}`} />
                           }
+                          nativeButton={false}
                           title="View"
                         >
                           <Eye className="size-4" />
@@ -331,6 +333,7 @@ export function InvoiceListClient({ initialInvoices }: InvoiceListClientProps) {
                             render={
                               <Link href={`/invoices/${invoice.id}`} />
                             }
+                            nativeButton={false}
                             title="Edit"
                           >
                             <Pencil className="size-4" />

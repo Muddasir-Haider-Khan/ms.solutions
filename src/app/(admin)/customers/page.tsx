@@ -20,7 +20,7 @@ export default async function CustomersPage() {
             Manage your customer directory
           </p>
         </div>
-        <Button render={<Link href="/customers/new" />}>
+        <Button render={<Link href="/customers/new" />} nativeButton={false}>
           <Plus className="size-4" />
           Add Customer
         </Button>

@@ -34,7 +34,7 @@ export default async function ProductsPage({
             Manage your product catalog
           </p>
         </div>
-        <Button render={<Link href="/products/new" />}>
+        <Button render={<Link href="/products/new" />} nativeButton={false}>
           <Plus className="size-4" />
           Add Product
         </Button>

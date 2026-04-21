@@ -9,9 +9,10 @@ import { authOptions } from "@/lib/auth";
 import {
   OrderStatus,
   PaymentStatus,
+  ProductStatus,
   StockMovementType,
+  Prisma,
 } from "@prisma/client";
-import { ProductStatus } from "@prisma/client";
 
 // ============================================================
 // AUTH HELPERS
@@ -115,7 +116,7 @@ export async function getStoreProducts(params?: {
     parsed.data;
   const skip = (page - 1) * limit;
 
-  const where: Record<string, unknown> = {
+  const where: Prisma.ProductWhereInput = {
     status: ProductStatus.ACTIVE,
   };
 
@@ -147,7 +148,7 @@ export async function getStoreProducts(params?: {
     };
   }
 
-  const orderBy: Record<string, string> =
+  const orderBy: Prisma.ProductOrderByWithRelationInput =
     sort === "price_asc"
       ? { sellingPrice: "asc" }
       : sort === "price_desc"

@@ -37,7 +37,7 @@ export default async function OrderSuccessPage({
             <p className="mt-1 text-sm text-muted-foreground">
               Invalid or missing order ID.
             </p>
-            <Button className="mt-6" render={<Link href="/shop" />}>
+            <Button className="mt-6" render={<Link href="/shop" />} nativeButton={false}>
               Continue Shopping
             </Button>
           </CardContent>
@@ -59,7 +59,7 @@ export default async function OrderSuccessPage({
             <p className="mt-1 text-sm text-muted-foreground">
               This order may have been removed or doesn&apos;t exist.
             </p>
-            <Button className="mt-6" render={<Link href="/shop" />}>
+            <Button className="mt-6" render={<Link href="/shop" />} nativeButton={false}>
               Continue Shopping
             </Button>
           </CardContent>
@@ -264,6 +264,7 @@ export default async function OrderSuccessPage({
             render={
               <a href={waUrl} target="_blank" rel="noopener noreferrer" />
             }
+            nativeButton={false}
           >
             <MessageCircle className="size-5" />
             {isWhatsApp ? "Open WhatsApp Again" : "Contact on WhatsApp"}
@@ -274,6 +275,7 @@ export default async function OrderSuccessPage({
             size="lg"
             className="flex-1 gap-2"
             render={<Link href="/account/orders" />}
+            nativeButton={false}
           >
             <ClipboardList className="size-4" />
             Track My Orders
@@ -284,6 +286,7 @@ export default async function OrderSuccessPage({
             size="lg"
             className="flex-1 gap-2"
             render={<Link href="/shop" />}
+            nativeButton={false}
           >
             <ShoppingBag className="size-4" />
             Continue Shopping

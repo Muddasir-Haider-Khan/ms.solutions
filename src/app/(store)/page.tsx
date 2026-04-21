@@ -39,10 +39,21 @@ export default async function StoreHomePage() {
             Discover our wide range of curated technology and essentials designed to elevate your everyday experience.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button size="lg" className="rounded-full px-8 py-6 text-base font-medium" render={<Link href="/shop" />}>
+            <Button
+              size="lg"
+              className="rounded-full px-8 py-6 text-base font-medium"
+              render={<Link href="/shop" />}
+              nativeButton={false}
+            >
               Shop Now
             </Button>
-            <Button size="lg" variant="link" className="text-base font-medium text-primary hover:text-brand-blue-hover" render={<Link href="/shop" />}>
+            <Button
+              size="lg"
+              variant="link"
+              className="text-base font-medium text-primary hover:text-brand-blue-hover"
+              render={<Link href="/shop" />}
+              nativeButton={false}
+            >
               Explore categories <ChevronRight className="size-4 ml-1" />
             </Button>
           </div>

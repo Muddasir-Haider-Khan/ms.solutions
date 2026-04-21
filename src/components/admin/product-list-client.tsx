@@ -302,7 +302,12 @@ export function ProductListClient({ categories }: ProductListClientProps) {
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                       <ImageIcon className="size-8" />
                       <p>No products found.</p>
-                      <Button variant="outline" size="sm" render={<Link href="/products/new" />}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        render={<Link href="/products/new" />}
+                        nativeButton={false}
+                      >
                         <Plus className="size-4" />
                         Add your first product
                       </Button>

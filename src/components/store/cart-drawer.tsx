@@ -14,9 +14,9 @@ export function CartDrawer() {
     <Sheet>
       <SheetTrigger
         render={
-          <div
-            role="button"
-            className="relative text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
+          <button
+            type="button"
+            className="relative text-muted-foreground hover:text-foreground transition-colors group"
           >
             <ShoppingBag className="size-5 font-light" strokeWidth={1.5} />
             {totalQuantity > 0 && (
@@ -24,7 +24,7 @@ export function CartDrawer() {
                 {totalQuantity}
               </span>
             )}
-          </div>
+          </button>
         }
       />
       <SheetContent className="w-full sm:max-w-md bg-white/80 backdrop-blur-3xl border-l border-white/20 p-0 flex flex-col">

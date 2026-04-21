@@ -46,7 +46,7 @@ export default async function InvoicesPage() {
             Create and manage invoices for your customers
           </p>
         </div>
-        <Button render={<Link href="/invoices/new" />}>
+        <Button render={<Link href="/invoices/new" />} nativeButton={false}>
           <Plus className="size-4" />
           New Invoice
         </Button>
