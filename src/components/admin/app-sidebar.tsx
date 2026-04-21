@@ -74,9 +74,11 @@ export function AppSidebar({ userRole }: { userRole: string }) {
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Package className="size-4" />
               </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold flex items-center h-5">
                    <img src="/images/logo.png" alt="MS Solutions" className="h-full w-auto object-contain" />
                 </span>
+                <span className="truncate text-xs text-muted-foreground">
                   Business Manager
                 </span>
               </div>
