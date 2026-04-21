@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, RotateCcw, Eye, Package } from "lucide-react";
 import { formatCurrency } from "@/lib/slugs";
 
@@ -32,6 +33,7 @@ const VISIBLE = 5;
 export function NewArrivalsCarousel({ products }: { products: Product[] }) {
   const [index, setIndex] = useState(0);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
+  const router = useRouter();
   const max = Math.max(0, products.length - VISIBLE);
 
   return (
@@ -62,8 +64,8 @@ export function NewArrivalsCarousel({ products }: { products: Product[] }) {
                 style={{ width: `${100 / VISIBLE}%`, padding: "0 8px" }}
               >
                 <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                  <Link href={`/shop/${product.slug}`}>
-                    <div className="relative aspect-square overflow-hidden bg-[#f7f7f7]">
+                  <div className="relative aspect-square overflow-hidden bg-[#f7f7f7]">
+                    <Link href={`/shop/${product.slug}`} className="block size-full">
                       {hasImage ? (
                         <img
                           src={product.images![0].url}
@@ -76,41 +78,39 @@ export function NewArrivalsCarousel({ products }: { products: Product[] }) {
                           <Package className="size-12 text-gray-200" />
                         </div>
                       )}
+                    </Link>
 
-                      {/* Hover overlay buttons */}
-                      <div className="absolute inset-0 flex items-center justify-center gap-2.5 bg-black/5 opacity-0 transition-all duration-300 group-hover:opacity-100">
-                        <button
-                          onClick={(e) => e.preventDefault()}
-                          title="Wishlist"
-                          className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0"
-                        >
-                          <Heart className="size-4" />
-                        </button>
-                        <Link
-                          href={`/shop/compare?id=${product.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          title="Compare"
-                          className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0 [transition-delay:50ms]"
-                        >
-                          <RotateCcw className="size-4" />
-                        </Link>
-                        <Link
-                          href={`/shop/${product.slug}`}
-                          onClick={(e) => e.stopPropagation()}
-                          title="View"
-                          className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0 [transition-delay:100ms]"
-                        >
-                          <Eye className="size-4" />
-                        </Link>
-                      </div>
-
-                      {hasDiscount && (
-                        <span className="absolute left-2.5 top-2.5 rounded-lg border border-[#333] bg-white px-2 py-0.5 text-[11px] font-bold text-[#333]">
-                          -{Math.round(((product.comparePrice! - product.sellingPrice) / product.comparePrice!) * 100)}%
-                        </span>
-                      )}
+                    {/* Hover overlay buttons — outside the Link to avoid nested <a> */}
+                    <div className="absolute inset-0 flex items-center justify-center gap-2.5 bg-black/5 opacity-0 transition-all duration-300 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
+                      <button
+                        onClick={(e) => { e.preventDefault(); }}
+                        title="Wishlist"
+                        className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0"
+                      >
+                        <Heart className="size-4" />
+                      </button>
+                      <button
+                        onClick={() => router.push(`/shop/compare?id=${product.id}`)}
+                        title="Compare"
+                        className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0 [transition-delay:50ms]"
+                      >
+                        <RotateCcw className="size-4" />
+                      </button>
+                      <button
+                        onClick={() => router.push(`/shop/${product.slug}`)}
+                        title="View"
+                        className="flex size-9 translate-y-3 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:bg-[#00796b] hover:text-white group-hover:translate-y-0 [transition-delay:100ms]"
+                      >
+                        <Eye className="size-4" />
+                      </button>
                     </div>
-                  </Link>
+
+                    {hasDiscount && (
+                      <span className="absolute left-2.5 top-2.5 rounded-lg border border-[#333] bg-white px-2 py-0.5 text-[11px] font-bold text-[#333]">
+                        -{Math.round(((product.comparePrice! - product.sellingPrice) / product.comparePrice!) * 100)}%
+                      </span>
+                    )}
+                  </div>
                   <div className="p-3.5">
                     {product.category && (
                       <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{product.category.name}</p>
