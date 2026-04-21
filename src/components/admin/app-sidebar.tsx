@@ -70,6 +70,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
             <SidebarMenuButton
               size="lg"
               render={<Link href="/dashboard" />}
+              nativeButton={false}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Package className="size-4" />
@@ -98,6 +99,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                     isActive={isActive(item.href)}
                     tooltip={item.title}
                     render={<Link href={item.href} />}
+                    nativeButton={false}
                   >
                     <item.icon />
                     <span>{item.title}</span>
@@ -118,6 +120,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                     isActive={isActive(item.href)}
                     tooltip={item.title}
                     render={<Link href={item.href} />}
+                    nativeButton={false}
                   >
                     <item.icon />
                     <span>{item.title}</span>
@@ -133,7 +136,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Storefront" render={<Link href="/shop" target="_blank" />}>
+                <SidebarMenuButton tooltip="Storefront" render={<Link href="/shop" target="_blank" />} nativeButton={false}>
                   <Store />
                   <span>Storefront</span>
                 </SidebarMenuButton>
@@ -154,6 +157,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                       isActive={isActive(item.href)}
                       tooltip={item.title}
                       render={<Link href={item.href} />}
+                      nativeButton={false}
                     >
                       <item.icon />
                       <span>{item.title}</span>
@@ -184,7 +188,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                 <ChevronDown className="ml-auto size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[--radix-dropdown-menu-trigger-width]">
-                <DropdownMenuItem render={<Link href="/settings" />}>
+                <DropdownMenuItem render={<Link href="/settings" />} nativeButton={false}>
                   <Settings className="mr-2 size-4" />
                   Settings
                 </DropdownMenuItem>
@@ -192,6 +196,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                   render={
                     <form action="/api/auth/signout" method="POST" className="w-full" />
                   }
+                  nativeButton={false}
                 >
                   <LogOut className="mr-2 size-4" />
                   Sign out

@@ -141,6 +141,7 @@ export function CustomerForm({ customer }: CustomerFormProps) {
           variant="outline"
           size="icon"
           render={<Link href="/customers" />}
+          nativeButton={false}
         >
           <ArrowLeft className="size-4" />
         </Button>
@@ -154,6 +155,7 @@ export function CustomerForm({ customer }: CustomerFormProps) {
             type="button"
             variant="outline"
             render={<Link href="/customers" />}
+            nativeButton={false}
           >
             Cancel
           </Button>

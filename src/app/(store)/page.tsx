@@ -163,9 +163,14 @@ export default async function StoreHomePage() {
             </div>
             
             <div className="mt-16 text-center">
-               <Button variant="outline" className="rounded-full px-8 py-6 text-sm font-medium" render={<Link href="/shop" />}>
-                 View all categories
-               </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full px-8 py-6 text-sm font-medium"
+                  render={<Link href="/shop" />}
+                  nativeButton={false}
+                >
+                  View all categories
+                </Button>
             </div>
           </div>
         </section>
@@ -219,6 +224,7 @@ export default async function StoreHomePage() {
           <Button
             className="rounded-full bg-background text-foreground hover:bg-background/90 px-8 py-6 text-base font-semibold"
             render={<Link href="/shop" />}
+            nativeButton={false}
           >
             Start exploring
           </Button>

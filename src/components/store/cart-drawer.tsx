@@ -104,11 +104,13 @@ export function CartDrawer() {
             </div>
             
             <SheetClose asChild>
-              <Link href="/checkout">
-                <Button className="w-full rounded-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_24px_rgba(24,127,244,0.25)] flex items-center justify-center gap-2 mt-4">
-                  Check Out <ArrowRight className="size-5" />
-                </Button>
-              </Link>
+              <Button
+                className="w-full rounded-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_24px_rgba(24,127,244,0.25)] flex items-center justify-center gap-2 mt-4"
+                render={<Link href="/checkout" />}
+                nativeButton={false}
+              >
+                Check Out <ArrowRight className="size-5" />
+              </Button>
             </SheetClose>
           </div>
         )}

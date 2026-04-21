@@ -371,6 +371,7 @@ export function ProductListClient({ categories }: ProductListClientProps) {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             render={<Link href={`/products/${product.id}`} />}
+                            nativeButton={false}
                           >
                             <Pencil className="size-4" />
                             Edit

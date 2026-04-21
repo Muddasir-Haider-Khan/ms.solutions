@@ -197,6 +197,7 @@ export function CustomerListClient({
                         variant="outline"
                         size="sm"
                         render={<Link href="/customers/new" />}
+                        nativeButton={false}
                       >
                         <Plus className="size-4" />
                         Add your first customer
@@ -250,6 +251,7 @@ export function CustomerListClient({
                             render={
                               <Link href={`/customers/${customer.id}`} />
                             }
+                            nativeButton={false}
                           >
                             <Pencil className="size-4" />
                             Edit

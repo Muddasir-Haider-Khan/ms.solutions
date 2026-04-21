@@ -281,6 +281,7 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
             variant="outline"
             size="icon"
             render={<Link href="/invoices" />}
+            nativeButton={false}
           >
             <ArrowLeft className="size-4" />
           </Button>
