@@ -1,0 +1,17 @@
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Loop mark icon -->
+  <!-- left square ring -->
+  <rect x="20" y="20" width="72" height="72" rx="14" fill="none" stroke="#00796b" stroke-width="6"/>
+  <!-- right square ring, overlapping -->
+  <rect x="64" y="20" width="72" height="72" rx="14" fill="none" stroke="#00796b" stroke-width="6" opacity=".45"/>
+  <!-- white mask to create interlace illusion -->
+  <rect x="64" y="30" width="22" height="52" fill="#ffffff"/>
+  <!-- re-draw left ring front segment over the mask -->
+  <path d="M64 32 L64 80" stroke="#00796b" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Wordmark -->
+  <text x="158" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="34" font-weight="700" fill="#1a1a1a" letter-spacing="-0.02em">Multi</text>
+  <text x="158" y="84" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#00796b" letter-spacing="0.07em">SOLUTIONS</text>
+
+</svg>

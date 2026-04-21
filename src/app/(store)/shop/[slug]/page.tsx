@@ -1,26 +1,19 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  Package,
-  ShoppingCart,
-  Minus,
-  Plus,
-  ArrowLeft,
-  Share2,
   Truck,
   Shield,
   RotateCcw,
-  MapPin,
+  ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getStoreProduct, getRelatedProducts } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
 import { ProductDetailClient } from "./product-detail-client";
+import { ProductImageGallery } from "./product-image-gallery";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Package } from "lucide-react";
 
 export const metadata = {
   title: "Product - MS Solutions",
@@ -34,9 +27,8 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
 
-  const [productResult, relatedResult, session] = await Promise.all([
+  const [productResult, session] = await Promise.all([
     getStoreProduct(slug),
-    getRelatedProducts("", undefined), // We'll get related after knowing the product
     getServerSession(authOptions),
   ]);
 
@@ -46,265 +38,230 @@ export default async function ProductDetailPage({
 
   const product = productResult.data;
 
-  // Get related products now that we know the category
-  let relatedProducts: { id: string; name: string; slug: string; sellingPrice: number; comparePrice: number | null; images: { url: string }[] }[] = [];
-  if (relatedResult.success && relatedResult.data) {
-    relatedProducts = relatedResult.data;
-  }
-
-  // Re-fetch related with the correct category
   const relatedWithCategory = await getRelatedProducts(
     product.id,
     product.categoryId ?? undefined
   );
-  if (relatedWithCategory.success && relatedWithCategory.data) {
-    relatedProducts = relatedWithCategory.data;
-  }
+  const relatedProducts =
+    relatedWithCategory.success && relatedWithCategory.data
+      ? relatedWithCategory.data
+      : [];
 
-  const mainImage =
-    product.images && product.images.length > 0 ? product.images[0] : null;
+  const hasDiscount =
+    product.comparePrice && product.comparePrice > product.sellingPrice;
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((product.comparePrice! - product.sellingPrice) /
+          product.comparePrice!) *
+          100
+      )
+    : 0;
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-8">
+    <div className="bg-white">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
-          Home
-        </Link>
-        <span>/</span>
-        <Link href="/shop" className="hover:text-foreground transition-colors">
-          Shop
-        </Link>
-        {product.category && (
-          <>
-            <span>/</span>
-            <Link
-              href={`/shop?category=${product.category.id}`}
-              className="hover:text-foreground transition-colors"
-            >
-              {product.category.name}
-            </Link>
-          </>
-        )}
-        <span>/</span>
-        <span className="text-foreground">{product.name}</span>
-      </nav>
-
-      <div className="flex flex-col lg:flex-row gap-6 mt-4">
-        {/* Left Column: Product Images (approx 40%) */}
-        <div className="w-full lg:w-[40%] flex gap-4">
-          {/* Thumbnails (vertical on desktop) */}
-          {product.images && product.images.length > 1 && (
-            <div className="hidden md:flex flex-col gap-2 w-12 shrink-0">
-              {product.images.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="relative aspect-square cursor-pointer overflow-hidden rounded-sm border border-transparent hover:border-[#FF9900] shadow-[0_0_2px_rgba(0,0,0,0.15)]"
-                >
-                  <img
-                    src={image.url}
-                    alt={image.altText || `${product.name} ${index + 1}`}
-                    className="size-full object-contain mix-blend-multiply"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Main Image */}
-          <div className="relative flex-1 aspect-square bg-[#F8F8F8] p-4 flex items-center justify-center">
-            {mainImage ? (
-              <img
-                src={mainImage.url}
-                alt={mainImage.altText || product.name}
-                className="max-h-full max-w-full object-contain mix-blend-multiply"
-              />
-            ) : (
-              <Package className="size-24 text-muted-foreground/30" />
+      <div className="border-b border-gray-100 bg-[#fafafa]">
+        <div className="container mx-auto px-4 py-3">
+          <nav className="flex items-center gap-1.5 text-sm text-gray-500">
+            <Link href="/" className="transition-colors hover:text-store-accent">Home</Link>
+            <ChevronRight className="size-3.5 text-gray-400" />
+            <Link href="/shop" className="transition-colors hover:text-store-accent">Shop</Link>
+            {product.category && (
+              <>
+                <ChevronRight className="size-3.5 text-gray-400" />
+                <Link href={`/shop?category=${product.category.id}`} className="transition-colors hover:text-store-accent">
+                  {product.category.name}
+                </Link>
+              </>
             )}
-            {product.comparePrice &&
-              product.comparePrice > product.sellingPrice && (
-                <div className="absolute right-0 top-0 bg-[#CC0C39] text-white text-[12px] px-2 py-1 font-bold rounded-bl-md">
-                  {Math.round(
-                    ((product.comparePrice - product.sellingPrice) /
-                      product.comparePrice) *
-                      100
-                  )}
-                  % off
-                </div>
-              )}
-          </div>
-        </div>
-
-        {/* Center Column: Product Info (approx 35%) */}
-        <div className="w-full lg:w-[35%] flex flex-col pt-1">
-          <h1 className="text-[24px] font-medium leading-[1.3] text-[#0F1111]">
-            {product.name}
-          </h1>
-          {product.brand && (
-            <Link href={`/shop?brand=${product.brand}`} className="text-[14px] text-[#007185] hover:text-[#C7511F] hover:underline mt-1">
-              Visit the {product.brand} Store
-            </Link>
-          )}
-          
-          <div className="flex items-center gap-4 mt-2">
-            <div className="flex items-center gap-1">
-              <span className="text-[14px] text-[#FFA41C]">★★★★☆</span>
-              <span className="text-[#007185] text-[14px] hover:underline cursor-pointer">
-                128 ratings
-              </span>
-            </div>
-            <span className="text-[14px] text-[#007185] hover:underline cursor-pointer">Search this page</span>
-          </div>
-
-          <Separator className="my-3 bg-[#D5D9D9]" />
-
-          {/* Price Block */}
-          <div className="flex flex-col gap-1">
-            {product.comparePrice && product.comparePrice > product.sellingPrice && (
-              <div className="flex items-center gap-2">
-                <span className="text-[24px] text-[#CC0C39] whitespace-nowrap leading-none mt-1">
-                 -{Math.round(((product.comparePrice - product.sellingPrice) / product.comparePrice) * 100)}%
-                </span>
-                <div className="flex items-baseline gap-[2px]">
-                  <span className="text-[13px] text-[#0F1111] relative -top-[8px]">Rs.</span>
-                  <span className="text-[28px] font-medium text-[#0F1111] leading-none">
-                    {product.sellingPrice.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            )}
-            {!product.comparePrice || product.comparePrice <= product.sellingPrice ? (
-              <div className="flex items-baseline gap-[2px]">
-                <span className="text-[13px] text-[#0F1111] relative -top-[8px]">Rs.</span>
-                <span className="text-[28px] font-medium text-[#0F1111] leading-none">
-                  {product.sellingPrice.toLocaleString()}
-                </span>
-              </div>
-            ) : null}
-
-            {product.comparePrice && product.comparePrice > product.sellingPrice && (
-              <div className="text-[12px] text-[#565959] mt-[2px] flex items-center gap-1">
-                Typical price: <span className="line-through">Rs. {product.comparePrice.toLocaleString()}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Tax info */}
-          <div className="text-[14px] text-[#0F1111] mt-2">
-            Inclusive of all taxes.
-          </div>
-          
-          <Separator className="my-4 bg-[#D5D9D9]" />
-
-          {/* Extra generic specs */}
-          <div className="grid grid-cols-[120px_1fr] gap-2 text-[14px] text-[#0F1111] mb-2">
-            <span className="font-bold">SKU</span>
-            <span className="font-mono text-xs">{product.sku}</span>
-          </div>
-
-          <Separator className="my-4 bg-[#D5D9D9]" />
-
-          {/* Description */}
-          <div className="text-[14px] text-[#0F1111] space-y-4">
-            <h3 className="font-bold text-[16px]">About this item</h3>
-            {product.shortDescription && (
-              <ul className="list-disc pl-5 space-y-2">
-                <li>{product.shortDescription}</li>
-              </ul>
-            )}
-            {product.description && (
-              <div className="whitespace-pre-line leading-relaxed">
-                {product.description}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Buy Box (approx 25%) */}
-        <div className="w-full lg:w-72 lg:min-w-[280px]">
-          <div className="border border-[#D5D9D9] rounded-lg p-4 bg-white">
-            <div className="flex items-baseline gap-[2px] mb-2">
-               <span className="text-[12px] text-[#0F1111] relative -top-[4px]">Rs.</span>
-               <span className="text-[24px] font-medium text-[#0F1111] leading-none">
-                 {product.sellingPrice.toLocaleString()}
-               </span>
-            </div>
-
-            <div className="text-[14px] text-[#0F1111] leading-snug mb-4">
-              <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">FREE Returns</span>
-            </div>
-
-            <div className="flex gap-2 items-start mt-2">
-               <MapPin className="size-[16px] text-[#0F1111] shrink-0 mt-[2px]" />
-               <span className="text-[13px] text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer leading-tight">
-                 Deliver to Pakistan
-               </span>
-            </div>
-            
-            <h2 className="text-[18px] font-medium text-[#007600] mt-4 mb-2">
-              {product.quantityInStock > 0 ? "In Stock" : <span className="text-[#B12704]">Currently unavailable.</span>}
-            </h2>
-
-            <ProductDetailClient product={product} isAuthenticated={!!session?.user} />
-
-            <div className="mt-4 space-y-2 text-[12px] text-[#565959]">
-              <div className="grid grid-cols-[100px_1fr]">
-                <span>Payment</span>
-                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Secure transaction</span>
-              </div>
-              <div className="grid grid-cols-[100px_1fr]">
-                <span>Ships from</span>
-                <span>MS Solutions</span>
-              </div>
-              <div className="grid grid-cols-[100px_1fr]">
-                <span>Sold by</span>
-                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">MS Solutions</span>
-              </div>
-              <div className="grid grid-cols-[100px_1fr]">
-                <span>Returns</span>
-                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Eligible for Return</span>
-              </div>
-            </div>
-          </div>
+            <ChevronRight className="size-3.5 text-gray-400" />
+            <span className="font-medium text-store-accent line-clamp-1">{product.name}</span>
+          </nav>
         </div>
       </div>
 
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <section className="mt-12">
-          <h2 className="mb-6 text-xl font-bold">Related Products</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {relatedProducts.map((related) => (
-              <Link key={related.id} href={`/shop/${related.slug}`}>
-                <Card className="group h-full overflow-hidden transition-all hover:shadow-md hover:ring-1 hover:ring-primary/20">
-                  <div className="aspect-square overflow-hidden bg-muted">
-                    {related.images && related.images.length > 0 ? (
-                      <img
-                        src={related.images[0].url}
-                        alt={related.name}
-                        className="size-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex size-full items-center justify-center">
-                        <Package className="size-10 text-muted-foreground/30" />
-                      </div>
-                    )}
-                  </div>
-                  <CardContent className="p-3">
-                    <h3 className="line-clamp-1 text-sm font-medium">
-                      {related.name}
-                    </h3>
-                    <span className="mt-1 block text-sm font-bold text-primary">
-                      {formatCurrency(related.sellingPrice)}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid gap-10 lg:grid-cols-2">
+          {/* Product Images — interactive gallery */}
+          <div className="relative">
+            {hasDiscount && (
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-store-sale px-3 py-1 text-sm font-bold text-white shadow">
+                -{discountPercent}% OFF
+              </div>
+            )}
+            <ProductImageGallery
+              images={(product.images ?? []).map((img) => ({
+                id: img.id,
+                url: img.url,
+                altText: img.altText ?? null,
+              }))}
+              productName={product.name}
+            />
           </div>
-        </section>
-      )}
+
+          {/* Product Info — sticky on desktop */}
+          <div className="flex flex-col lg:sticky lg:top-24 lg:self-start">
+            {/* Category + Brand */}
+            <div className="flex items-center gap-3">
+              {product.category && (
+                <Link
+                  href={`/shop?category=${product.category.id}`}
+                  className="rounded-full bg-store-accent-light px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-store-accent"
+                >
+                  {product.category.name}
+                </Link>
+              )}
+              {product.brand && (
+                <span className="text-[12px] text-gray-400">{product.brand}</span>
+              )}
+            </div>
+
+            <h1 className="mt-3 text-2xl font-bold leading-tight text-gray-900 md:text-3xl">
+              {product.name}
+            </h1>
+
+            <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-400">
+              <span className="font-mono">SKU: {product.sku}</span>
+            </div>
+
+            {/* Price block */}
+            <div className="mt-5 flex items-baseline gap-3">
+              <span className="text-3xl font-bold text-store-accent">
+                {formatCurrency(product.sellingPrice)}
+              </span>
+              {hasDiscount && (
+                <>
+                  <span className="text-lg text-store-muted line-through">
+                    {formatCurrency(product.comparePrice!)}
+                  </span>
+                  <span className="rounded-md bg-store-sale/10 px-2 py-0.5 text-xs font-bold text-store-sale">
+                    Save {formatCurrency(product.comparePrice! - product.sellingPrice)}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Stock Status */}
+            <div className="mt-3">
+              {product.quantityInStock > 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+                  <span className="size-1.5 animate-pulse rounded-full bg-green-500" />
+                  In Stock ({product.quantityInStock} available)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
+                  <span className="size-1.5 rounded-full bg-red-500" />
+                  Out of Stock
+                </span>
+              )}
+            </div>
+
+            <Separator className="my-5" />
+
+            {/* Short description */}
+            {product.shortDescription && (
+              <p className="text-sm leading-relaxed text-gray-600">
+                {product.shortDescription}
+              </p>
+            )}
+
+            {/* Add to Cart */}
+            <div className="mt-5">
+              <ProductDetailClient
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  sku: product.sku,
+                  sellingPrice: product.sellingPrice,
+                  comparePrice: product.comparePrice ?? null,
+                  quantityInStock: product.quantityInStock,
+                  trackInventory: product.trackInventory,
+                  images: product.images ?? [],
+                  variants: product.variants ?? [],
+                }}
+                isAuthenticated={!!session?.user}
+              />
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {[
+                { icon: Truck,      label: "Fast Delivery",    sub: "Nationwide" },
+                { icon: Shield,     label: "Secure Payment",   sub: "100% Safe" },
+                { icon: RotateCcw,  label: "Easy Returns",     sub: "7-day policy" },
+              ].map(({ icon: Icon, label, sub }) => (
+                <div key={label} className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 p-3 text-center transition-all hover:border-store-accent/30 hover:bg-store-accent-light/30">
+                  <Icon className="size-5 text-store-accent" />
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-700">{label}</p>
+                    <p className="text-[10px] text-gray-400">{sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Full description */}
+        {product.description && (
+          <section className="mt-12 border-t border-gray-100 pt-10">
+            <h2 className="mb-4 text-lg font-bold text-gray-900">Product Description</h2>
+            <div className="prose prose-sm max-w-none whitespace-pre-line text-[14px] leading-relaxed text-gray-600">
+              {product.description}
+            </div>
+          </section>
+        )}
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <section className="mt-12 border-t border-gray-100 pt-10">
+            <h2 className="mb-6 text-xl font-bold text-gray-900">Related Products</h2>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              {relatedProducts.map((related) => {
+                const relHasDiscount =
+                  related.comparePrice && related.comparePrice > related.sellingPrice;
+                const relDiscountPercent = relHasDiscount
+                  ? Math.round(
+                      ((related.comparePrice! - related.sellingPrice) / related.comparePrice!) * 100
+                    )
+                  : 0;
+
+                return (
+                  <Link key={related.id} href={`/shop/${related.slug}`}>
+                    <div className="group overflow-hidden rounded-xl border border-gray-100 bg-white transition-all duration-200 hover:shadow-lg hover:shadow-black/8">
+                      <div className="relative aspect-square overflow-hidden bg-store-light-bg">
+                        {related.images && related.images.length > 0 ? (
+                          <img
+                            src={related.images[0].url}
+                            alt={related.name}
+                            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex size-full items-center justify-center">
+                            <Package className="size-10 text-store-muted/30" />
+                          </div>
+                        )}
+                        {relHasDiscount && (
+                          <span className="absolute right-2.5 top-2.5 rounded-md bg-store-sale px-2 py-0.5 text-[11px] font-bold text-white">
+                            -{relDiscountPercent}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-3.5">
+                        <h3 className="line-clamp-2 text-sm font-medium text-gray-900">{related.name}</h3>
+                        <span className="mt-1 block text-base font-bold text-store-accent">
+                          {formatCurrency(related.sellingPrice)}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

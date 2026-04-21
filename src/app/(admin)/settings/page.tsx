@@ -1,7 +1,9 @@
+import { requireAdminRole } from "@/lib/permissions";
 import { getSettings } from "@/actions/settings";
 import { SettingsForm } from "@/components/admin/settings-form";
 
 export default async function SettingsPage() {
+  await requireAdminRole();
   const result = await getSettings();
   const settings = result.success && result.data ? result.data : null;
 

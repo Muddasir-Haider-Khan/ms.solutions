@@ -54,53 +54,105 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Store-specific brand tokens */
+  --color-store-accent: var(--store-accent);
+  --color-store-accent-hover: var(--store-accent-hover);
+  --color-store-accent-light: var(--store-accent-light);
+  --color-store-dark: var(--store-dark);
+  --color-store-dark-light: var(--store-dark-light);
+  --color-store-sale: var(--store-sale);
+  --color-store-success: var(--store-success);
+  --color-store-muted: var(--store-muted);
+  --color-store-light-bg: var(--store-light-bg);
+  --color-store-warm-bg: var(--store-warm-bg);
+  --color-store-border: var(--store-border);
 }
 
 :root {
-  --background: #f5f5f7;
-  --foreground: #1d1d1f;
-  
-  --card: #ffffff;
-  --card-foreground: #1d1d1f;
-  
-  --popover: #ffffff;
-  --popover-foreground: #1d1d1f;
-  
-  --primary: #187ff4;
-  --primary-foreground: #ffffff;
-  
-  --secondary: #e8e8ed;
-  --secondary-foreground: #1d1d1f;
-  
-  --muted: #f2f2f7;
-  --muted-foreground: #86868b;
-  
-  --accent: #f2f2f7;
-  --accent-foreground: #1d1d1f;
-  
-  --destructive: #ff3b30;
-  --destructive-foreground: #ffffff;
-  
-  --border: #d2d2d7;
-  --input: #d2d2d7;
-  --ring: rgba(24, 127, 244, 0.5);
-  
-  --chart-1: #187ff4;
-  --chart-2: #34c759;
-  --chart-3: #ff9500;
-  --chart-4: #ff3b30;
-  --chart-5: #5856d6;
-  
-  --radius: 0.75rem;
-  
-  --sidebar: #f5f5f7;
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-primary: #187ff4;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8e8ed;
-  --sidebar-accent-foreground: #1d1d1f;
-  --sidebar-border: #d2d2d7;
-  --sidebar-ring: rgba(24, 127, 244, 0.5);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  /* Store brand tokens - MegaMart theme */
+  --store-accent: #00796B;
+  --store-accent-hover: #00695C;
+  --store-accent-light: #E0F2F1;
+  --store-dark: #222222;
+  --store-dark-light: #333333;
+  --store-sale: #e53935;
+  --store-success: #43a047;
+  --store-muted: #999999;
+  --store-light-bg: #f5f5f5;
+  --store-warm-bg: #FFF8E1;
+  --store-border: #e0e0e0;
+  /* Sidebar — dark teal admin theme */
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.47 0.12 172);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.22 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.47 0.12 172);
+  /* Primary — teal for buttons/links in admin */
+  --primary: oklch(0.47 0.12 172);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.47 0.12 172);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
 @layer base {
@@ -110,10 +162,14 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-background text-foreground tracking-[-0.015em];
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.6;
   }
   html {
     @apply font-sans;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
   }
   
   h1, h2, h3, h4, h5, h6 {

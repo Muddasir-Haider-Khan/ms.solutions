@@ -17,6 +17,11 @@ import {
   LogOut,
   BarChart3,
   Receipt,
+  Image,
+  Newspaper,
+  LayoutTemplate,
+  Share2,
+  ExternalLink,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,49 +42,94 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const mainNav = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", href: "/products", icon: Package },
-  { title: "Categories", href: "/categories", icon: FolderTree },
-  { title: "Inventory", href: "/inventory", icon: Warehouse },
-  { title: "Customers", href: "/customers", icon: Users },
+type NavItem = {
+  title: string;
+  href: string;
+  icon: React.ElementType;
+  staffAllowed?: boolean; // true = STAFF can access
+};
+
+const mainNav: NavItem[] = [
+  { title: "Dashboard",  href: "/dashboard",  icon: LayoutDashboard, staffAllowed: true },
+  { title: "Products",   href: "/products",   icon: Package,         staffAllowed: true },
+  { title: "Categories", href: "/categories", icon: FolderTree,      staffAllowed: true },
+  { title: "Inventory",  href: "/inventory",  icon: Warehouse,       staffAllowed: true },
+  { title: "Customers",  href: "/customers",  icon: Users,           staffAllowed: true },
 ];
 
-const financeNav = [
-  { title: "Invoices", href: "/invoices", icon: FileText },
-  { title: "Orders", href: "/orders", icon: ShoppingCart },
-  { title: "Reports", href: "/reports", icon: BarChart3 },
+const financeNav: NavItem[] = [
+  { title: "Invoices", href: "/invoices", icon: FileText,    staffAllowed: false },
+  { title: "Orders",   href: "/orders",   icon: ShoppingCart, staffAllowed: true },
+  { title: "Reports",  href: "/reports",  icon: BarChart3,   staffAllowed: false },
 ];
 
-const systemNav = [
-  { title: "Settings", href: "/settings", icon: Settings },
-  { title: "Users", href: "/users", icon: UserCog, superAdmin: true },
+const storeNav: NavItem[] = [
+  { title: "Banners",      href: "/banners",      icon: Image,          staffAllowed: false },
+  { title: "Hero Cards",   href: "/hero-cards",   icon: LayoutTemplate, staffAllowed: false },
+  { title: "Articles",     href: "/articles",     icon: Newspaper,      staffAllowed: false },
+  { title: "Social Links", href: "/social-links", icon: Share2,         staffAllowed: false },
 ];
 
-export function AppSidebar({ userRole }: { userRole: string }) {
+const systemNav: NavItem[] = [
+  { title: "Settings", href: "/settings", icon: Settings, staffAllowed: false },
+];
+
+function isStaff(role: string) {
+  return role === "STAFF";
+}
+
+export function AppSidebar({
+  userRole,
+  userName,
+  userEmail,
+}: {
+  userRole: string;
+  userName?: string;
+  userEmail?: string;
+}) {
   const pathname = usePathname();
-
-  const isActive = (href: string) => pathname.startsWith(href);
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const staffOnly = isStaff(userRole);
+
+  function filterNav(items: NavItem[]) {
+    if (staffOnly) return items.filter((i) => i.staffAllowed);
+    return items;
+  }
+
+  const roleBadgeColor =
+    userRole === "SUPER_ADMIN"
+      ? "bg-amber-500/20 text-amber-300"
+      : userRole === "ADMIN"
+      ? "bg-teal-500/20 text-teal-300"
+      : "bg-gray-500/20 text-gray-300";
+
+  const roleLabel =
+    userRole === "SUPER_ADMIN"
+      ? "Super Admin"
+      : userRole === "ADMIN"
+      ? "Admin"
+      : "Staff";
+
+  const initials = userName
+    ? userName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    : roleLabel.slice(0, 2).toUpperCase();
 
   return (
     <Sidebar>
-      <SidebarHeader>
+      {/* ── Header / Brand ─────────────────────────────────────── */}
+      <SidebarHeader className="border-b border-sidebar-border pb-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={<Link href="/dashboard" />}
-              nativeButton={false}
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Package className="size-4" />
+            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />}>
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#00796b]">
+                <img src="/logo-icon.svg" alt="" className="size-5" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold flex items-center h-5">
-                   <img src="/images/logo.png" alt="MS Solutions" className="h-full w-auto object-contain" />
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate text-[14px] font-bold tracking-tight text-sidebar-foreground">
+                  Multi Solutions
                 </span>
-                <span className="truncate text-xs text-muted-foreground">
+                <span className="truncate text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
                   Business Manager
                 </span>
               </div>
@@ -88,70 +138,15 @@ export function AppSidebar({ userRole }: { userRole: string }) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNav.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.href)}
-                    tooltip={item.title}
-                    render={<Link href={item.href} />}
-                    nativeButton={false}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Finance</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {financeNav.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.href)}
-                    tooltip={item.title}
-                    render={<Link href={item.href} />}
-                    nativeButton={false}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Store</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Storefront" render={<Link href="/shop" target="_blank" />} nativeButton={false}>
-                  <Store />
-                  <span>Storefront</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>System</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {systemNav
-                .filter((item) => !item.superAdmin || isSuperAdmin)
-                .map((item) => (
+      {/* ── Nav Content ────────────────────────────────────────── */}
+      <SidebarContent className="gap-0">
+        {/* Management */}
+        {filterNav(mainNav).length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Management</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filterNav(mainNav).map((item) => (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       isActive={isActive(item.href)}
@@ -159,39 +154,137 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                       render={<Link href={item.href} />}
                       nativeButton={false}
                     >
-                      <item.icon />
+                      <item.icon className="size-4" />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Finance */}
+        {filterNav(financeNav).length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Finance</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filterNav(financeNav).map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={isActive(item.href)}
+                      tooltip={item.title}
+                      render={<Link href={item.href} />}
+                    >
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Store Content */}
+        {(!staffOnly && storeNav.length > 0) && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Storefront</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip="View Store"
+                    render={<Link href="/" target="_blank" />}
+                  >
+                    <Store className="size-4" />
+                    <span>View Store</span>
+                    <ExternalLink className="ml-auto size-3 opacity-50" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {storeNav.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={isActive(item.href)}
+                      tooltip={item.title}
+                      render={<Link href={item.href} />}
+                    >
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* System */}
+        {(!staffOnly || isSuperAdmin) && (
+          <SidebarGroup>
+            <SidebarGroupLabel>System</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filterNav(systemNav).map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={isActive(item.href)}
+                      tooltip={item.title}
+                      render={<Link href={item.href} />}
+                    >
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                {isSuperAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={isActive("/users")}
+                      tooltip="Users"
+                      render={<Link href="/users" />}
+                    >
+                      <UserCog className="size-4" />
+                      <span>Users</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
-      <SidebarFooter>
+      {/* ── Footer / User ───────────────────────────────────────── */}
+      <SidebarFooter className="border-t border-sidebar-border pt-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <SidebarMenuButton size="lg" />
-                }
-              >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-muted">
-                  <FileText className="size-4" />
+              <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#00796b] text-[12px] font-bold text-white">
+                  {initials}
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Admin</span>
-                  <span className="truncate text-xs">{userRole}</span>
+                <div className="grid flex-1 text-left leading-tight">
+                  <span className="truncate text-[13px] font-semibold text-sidebar-foreground">
+                    {userName || "Admin"}
+                  </span>
+                  <span className={`truncate rounded text-[10px] font-semibold px-1.5 py-0.5 w-fit ${roleBadgeColor}`}>
+                    {roleLabel}
+                  </span>
                 </div>
-                <ChevronDown className="ml-auto size-4" />
+                <ChevronDown className="ml-auto size-4 text-sidebar-foreground/50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[--radix-dropdown-menu-trigger-width]">
-                <DropdownMenuItem render={<Link href="/settings" />} nativeButton={false}>
-                  <Settings className="mr-2 size-4" />
-                  Settings
-                </DropdownMenuItem>
+              <DropdownMenuContent
+                align="start"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-48"
+              >
+                {!staffOnly && (
+                  <DropdownMenuItem render={<Link href="/settings" />}>
+                    <Settings className="mr-2 size-4" />
+                    Settings
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   render={
                     <form action="/api/auth/signout" method="POST" className="w-full" />
@@ -199,7 +292,7 @@ export function AppSidebar({ userRole }: { userRole: string }) {
                   nativeButton={false}
                 >
                   <LogOut className="mr-2 size-4" />
-                  Sign out
+                  Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

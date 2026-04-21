@@ -8,11 +8,11 @@ import {
   Search,
   SlidersHorizontal,
   X,
-  ChevronDown,
   ShoppingCart,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -103,11 +103,21 @@ export function ShopClient({
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
-  // Local state for price filter to prevent layout thrashing on every keystroke
+  // Collapsible filter sections
+  const [categoriesOpen, setCategoriesOpen] = useState(true);
+  const [priceOpen, setPriceOpen] = useState(true);
+  const [brandsOpen, setBrandsOpen] = useState(true);
+
   const initialMin = currentMinPrice ? parseInt(currentMinPrice, 10) : 0;
   const initialMax = currentMaxPrice ? parseInt(currentMaxPrice, 10) : 50000;
-  const [localPriceParams, setLocalPriceParams] = useState({ min: currentMinPrice, max: currentMaxPrice });
-  const [sliderValue, setSliderValue] = useState<[number, number]>([initialMin, initialMax]);
+  const [localPriceParams, setLocalPriceParams] = useState({
+    min: currentMinPrice,
+    max: currentMaxPrice,
+  });
+  const [sliderValue, setSliderValue] = useState<[number, number]>([
+    initialMin,
+    initialMax,
+  ]);
 
   const currentPage = products?.pagination?.page ?? 1;
   const totalPages = products?.pagination?.totalPages ?? 1;
@@ -121,7 +131,6 @@ export function ShopClient({
         params.delete(key);
       }
     });
-    // Reset to page 1 when filters change
     if (!updates.hasOwnProperty("page")) {
       params.delete("page");
     }
@@ -158,7 +167,10 @@ export function ShopClient({
   }
 
   function handlePriceFilter() {
-    updateFilters({ minPrice: localPriceParams.min, maxPrice: localPriceParams.max });
+    updateFilters({
+      minPrice: localPriceParams.min,
+      maxPrice: localPriceParams.max,
+    });
   }
 
   function handleSliderChange(val: [number, number]) {
@@ -168,7 +180,6 @@ export function ShopClient({
 
   async function handleAddToCart(product: Product) {
     if (!isAuthenticated) {
-      // Use guest cart for unauthenticated users
       guestCart.addItem({
         productId: product.id,
         quantity: 1,
@@ -206,84 +217,122 @@ export function ShopClient({
   }
 
   const hasActiveFilters =
-    currentSearch || currentCategory || currentBrand || currentMinPrice || currentMaxPrice;
+    currentSearch ||
+    currentCategory ||
+    currentBrand ||
+    currentMinPrice ||
+    currentMaxPrice;
 
-  // Filter sidebar content
   const filterContent = (
-    <div className="space-y-6">
+    <div className="space-y-1">
       {/* Categories */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold">Categories</h3>
-        <div className="space-y-2">
-          {categories.map((category) => (
-            <label
-              key={category.id}
-              className="flex cursor-pointer items-center gap-2"
-            >
-              <Checkbox
-                checked={currentCategory === category.id}
-                onCheckedChange={() => handleCategoryToggle(category.id)}
-              />
-              <span className="text-sm">{category.name}</span>
-              <span className="ml-auto text-xs text-muted-foreground">
-                ({category._count.products})
-              </span>
-            </label>
-          ))}
-        </div>
+        <button
+          onClick={() => setCategoriesOpen(!categoriesOpen)}
+          className="flex w-full items-center justify-between py-3 text-sm font-semibold text-gray-900"
+        >
+          Categories
+          {categoriesOpen ? (
+            <ChevronUp className="size-4 text-gray-400" />
+          ) : (
+            <ChevronDown className="size-4 text-gray-400" />
+          )}
+        </button>
+        {categoriesOpen && (
+          <div className="space-y-2 pb-3">
+            {categories.map((category) => (
+              <label
+                key={category.id}
+                className="flex cursor-pointer items-center gap-2"
+              >
+                <Checkbox
+                  checked={currentCategory === category.id}
+                  onCheckedChange={() => handleCategoryToggle(category.id)}
+                />
+                <span className="text-sm text-gray-700">{category.name}</span>
+                <span className="ml-auto text-xs text-gray-400">
+                  ({category._count.products})
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       <Separator />
 
       {/* Price Range */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold">Price Range</h3>
-        <div className="mb-4 space-y-4">
-          <Slider
-            min={0}
-            max={100000}
-            step={500}
-            value={sliderValue}
-            minStepsBetweenValues={1}
-            onValueChange={(val: number[]) => handleSliderChange(val)}
-            className="w-full"
-          />
-          <div className="flex items-center justify-between font-medium">
-            <span className="text-xs text-muted-foreground">{formatCurrency(sliderValue[0])}</span>
-            <span className="text-xs text-muted-foreground">{formatCurrency(sliderValue[1])}</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mb-2">
-          <Input
-            type="number"
-            placeholder="Min"
-            value={localPriceParams.min}
-            onChange={(e) => {
-              setLocalPriceParams(prev => ({ ...prev, min: e.target.value }));
-              setSliderValue([Number(e.target.value) || 0, sliderValue[1]]);
-            }}
-            className="h-8 text-xs"
-          />
-          <span className="text-muted-foreground">-</span>
-          <Input
-            type="number"
-            placeholder="Max"
-            value={localPriceParams.max}
-            onChange={(e) => {
-              setLocalPriceParams(prev => ({ ...prev, max: e.target.value }));
-              setSliderValue([sliderValue[0], Number(e.target.value) || 100000]);
-            }}
-            className="h-8 text-xs"
-          />
-        </div>
-        <Button 
-          variant="secondary" 
-          size="sm" 
-          className="w-full text-xs font-semibold"
-          onClick={handlePriceFilter}
+        <button
+          onClick={() => setPriceOpen(!priceOpen)}
+          className="flex w-full items-center justify-between py-3 text-sm font-semibold text-gray-900"
         >
-          Apply Price Filter
-        </Button>
+          Price Range
+          {priceOpen ? (
+            <ChevronUp className="size-4 text-gray-400" />
+          ) : (
+            <ChevronDown className="size-4 text-gray-400" />
+          )}
+        </button>
+        {priceOpen && (
+          <div className="space-y-3 pb-3">
+            <Slider
+              min={0}
+              max={100000}
+              step={500}
+              value={sliderValue}
+              minStepsBetweenValues={1}
+              onValueChange={(val: any) => handleSliderChange(val)}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between font-medium">
+              <span className="text-xs text-gray-500">
+                {formatCurrency(sliderValue[0])}
+              </span>
+              <span className="text-xs text-gray-500">
+                {formatCurrency(sliderValue[1])}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                placeholder="Min"
+                value={localPriceParams.min}
+                onChange={(e) => {
+                  setLocalPriceParams((prev) => ({
+                    ...prev,
+                    min: e.target.value,
+                  }));
+                  setSliderValue([Number(e.target.value) || 0, sliderValue[1]]);
+                }}
+                className="h-8 text-xs"
+              />
+              <span className="text-gray-400">-</span>
+              <Input
+                type="number"
+                placeholder="Max"
+                value={localPriceParams.max}
+                onChange={(e) => {
+                  setLocalPriceParams((prev) => ({
+                    ...prev,
+                    max: e.target.value,
+                  }));
+                  setSliderValue([
+                    sliderValue[0],
+                    Number(e.target.value) || 100000,
+                  ]);
+                }}
+                className="h-8 text-xs"
+              />
+            </div>
+            <button
+              onClick={handlePriceFilter}
+              className="w-full rounded-full bg-store-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-store-accent-hover"
+            >
+              Apply Price Filter
+            </button>
+          </div>
+        )}
       </div>
 
       <Separator />
@@ -291,35 +340,45 @@ export function ShopClient({
       {/* Brands */}
       {brands.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-semibold">Brands</h3>
-          <div className="space-y-2">
-            {brands.map((brand) => (
-              <label
-                key={brand}
-                className="flex cursor-pointer items-center gap-2"
-              >
-                <Checkbox
-                  checked={currentBrand === brand}
-                  onCheckedChange={() => handleBrandToggle(brand)}
-                />
-                <span className="text-sm">{brand}</span>
-              </label>
-            ))}
-          </div>
+          <button
+            onClick={() => setBrandsOpen(!brandsOpen)}
+            className="flex w-full items-center justify-between py-3 text-sm font-semibold text-gray-900"
+          >
+            Brands
+            {brandsOpen ? (
+              <ChevronUp className="size-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="size-4 text-gray-400" />
+            )}
+          </button>
+          {brandsOpen && (
+            <div className="space-y-2 pb-3">
+              {brands.map((brand) => (
+                <label
+                  key={brand}
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <Checkbox
+                    checked={currentBrand === brand}
+                    onCheckedChange={() => handleBrandToggle(brand)}
+                  />
+                  <span className="text-sm text-gray-700">{brand}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {hasActiveFilters && (
         <>
           <Separator />
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
+          <button
             onClick={clearAllFilters}
+            className="mt-2 w-full rounded-full border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-100"
           >
             Clear All Filters
-          </Button>
+          </button>
         </>
       )}
     </div>
@@ -329,8 +388,8 @@ export function ShopClient({
     <div className="container mx-auto px-4 py-6 md:py-8">
       {/* Page header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold md:text-3xl">Shop</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Shop</h1>
+        <p className="text-sm text-gray-500">
           {products
             ? `${products.pagination.total} product${products.pagination.total !== 1 ? "s" : ""} found`
             : "Loading products..."}
@@ -339,38 +398,39 @@ export function ShopClient({
 
       {/* Search and Sort Bar */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <form onSubmit={handleSearch} className="flex flex-1 gap-2 sm:max-w-md">
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-1 gap-0 sm:max-w-md"
+        >
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+            <input
               type="search"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 min-w-0"
-              maxLength={100}
+              className="h-10 w-full rounded-l-full border border-r-0 border-gray-300 bg-white pl-9 pr-3 text-sm placeholder:text-gray-400 focus:border-store-accent focus:outline-none focus:ring-1 focus:ring-store-accent"
             />
           </div>
-          <Button type="submit" size="default">
+          <button
+            type="submit"
+            className="rounded-r-full bg-store-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+          >
             Search
-          </Button>
+          </button>
         </form>
 
         <div className="flex items-center gap-2">
-          {/* Mobile filter toggle */}
-          <Button
-            variant="outline"
-            size="default"
-            className="lg:hidden"
+          <button
+            className="flex h-10 items-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 lg:hidden"
             onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
           >
             <SlidersHorizontal className="size-4" />
             Filters
-          </Button>
+          </button>
 
-          {/* Sort dropdown */}
           <Select value={currentSort} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[160px] rounded-full">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -386,40 +446,40 @@ export function ShopClient({
       {hasActiveFilters && (
         <div className="mb-4 flex flex-wrap gap-2">
           {currentSearch && (
-            <Badge variant="secondary" className="gap-1">
+            <span className="flex items-center gap-1 rounded-full bg-store-accent-light px-3 py-1 text-xs font-medium text-store-accent">
               Search: {currentSearch}
               <button onClick={() => updateFilters({ search: "" })}>
                 <X className="size-3" />
               </button>
-            </Badge>
+            </span>
           )}
           {currentCategory && (
-            <Badge variant="secondary" className="gap-1">
+            <span className="flex items-center gap-1 rounded-full bg-store-accent-light px-3 py-1 text-xs font-medium text-store-accent">
               Category:{" "}
               {categories.find((c) => c.id === currentCategory)?.name ||
                 currentCategory}
               <button onClick={() => updateFilters({ category: "" })}>
                 <X className="size-3" />
               </button>
-            </Badge>
+            </span>
           )}
           {currentBrand && (
-            <Badge variant="secondary" className="gap-1">
+            <span className="flex items-center gap-1 rounded-full bg-store-accent-light px-3 py-1 text-xs font-medium text-store-accent">
               Brand: {currentBrand}
               <button onClick={() => updateFilters({ brand: "" })}>
                 <X className="size-3" />
               </button>
-            </Badge>
+            </span>
           )}
           {(currentMinPrice || currentMaxPrice) && (
-            <Badge variant="secondary" className="gap-1">
+            <span className="flex items-center gap-1 rounded-full bg-store-accent-light px-3 py-1 text-xs font-medium text-store-accent">
               Price: {currentMinPrice || "0"} - {currentMaxPrice || "..."}
               <button
                 onClick={() => updateFilters({ minPrice: "", maxPrice: "" })}
               >
                 <X className="size-3" />
               </button>
-            </Badge>
+            </span>
           )}
         </div>
       )}
@@ -427,7 +487,9 @@ export function ShopClient({
       <div className="flex gap-8">
         {/* Desktop Sidebar Filters */}
         <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="sticky top-24">{filterContent}</div>
+          <div className="sticky top-24 rounded-xl border bg-white p-4">
+            {filterContent}
+          </div>
         </aside>
 
         {/* Mobile Filters */}
@@ -437,7 +499,7 @@ export function ShopClient({
               className="absolute inset-0 bg-black/50"
               onClick={() => setMobileFiltersOpen(false)}
             />
-            <div className="absolute right-0 top-0 h-full w-80 max-w-full overflow-y-auto bg-background p-6">
+            <div className="absolute right-0 top-0 h-full w-80 max-w-full overflow-y-auto bg-white p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Filters</h2>
                 <Button
@@ -460,72 +522,96 @@ export function ShopClient({
               <div
                 className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 ${isPending ? "opacity-50" : "transition-opacity duration-300"}`}
               >
-                {products.products.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group relative flex flex-col overflow-hidden bg-card rounded-[2rem] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out h-[450px]"
-                  >
-                    <Link href={`/shop/${product.slug}`} className="flex flex-col flex-1 z-10 relative">
-                      {product.comparePrice && product.comparePrice > product.sellingPrice && (
-                        <span className="text-[11px] font-semibold text-[#ff3b30] uppercase tracking-wider mb-2">
-                          Save {Math.round(((product.comparePrice - product.sellingPrice) / product.comparePrice) * 100)}%
-                        </span>
-                      )}
-                      {product.featured && !product.comparePrice && (
-                        <span className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2">
-                          Featured
-                        </span>
-                      )}
-                      
-                      <h3 className="text-xl font-semibold leading-tight text-foreground mt-1 line-clamp-2">
-                        {product.name}
-                      </h3>
+                {products.products.map((product) => {
+                  const hasDiscount =
+                    product.comparePrice &&
+                    product.comparePrice > product.sellingPrice;
+                  const discountPercent = hasDiscount
+                    ? Math.round(
+                        ((product.comparePrice! - product.sellingPrice) /
+                          product.comparePrice!) *
+                          100
+                      )
+                    : 0;
 
-                      <div className="mt-3 flex items-baseline gap-[2px]">
-                        <span className="text-sm text-foreground">Rs.</span>
-                        <span className="text-xl font-medium text-foreground">
-                          {product.sellingPrice.toLocaleString()}
-                        </span>
+                  return (
+                    <div
+                      key={product.id}
+                      className="group overflow-hidden rounded-xl border bg-white transition-all duration-200 hover:shadow-lg hover:shadow-black/8"
+                    >
+                      <Link href={`/shop/${product.slug}`}>
+                        <div className="relative aspect-square overflow-hidden bg-store-light-bg">
+                          {product.images && product.images.length > 0 ? (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.images[0].altText || product.name}
+                              className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex size-full items-center justify-center">
+                              <Package className="size-12 text-store-muted/40" />
+                            </div>
+                          )}
+                          {product.featured && (
+                            <span className="absolute left-2.5 top-2.5 rounded-md bg-store-dark px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
+                              Featured
+                            </span>
+                          )}
+                          {hasDiscount && (
+                            <span className="absolute right-2.5 top-2.5 rounded-md bg-store-sale px-2 py-0.5 text-[11px] font-bold text-white">
+                              -{discountPercent}%
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                      <div className="p-3.5">
+                        {product.category && (
+                          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-store-muted">
+                            {product.category.name}
+                          </p>
+                        )}
+                        <Link href={`/shop/${product.slug}`}>
+                          <h3 className="line-clamp-2 text-sm font-medium leading-snug text-gray-900 transition-colors hover:text-store-accent">
+                            {product.name}
+                          </h3>
+                        </Link>
+                        {product.shortDescription && (
+                          <p className="mt-1 line-clamp-1 text-xs text-gray-400">
+                            {product.shortDescription}
+                          </p>
+                        )}
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="text-base font-bold text-store-accent">
+                            {formatCurrency(product.sellingPrice)}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-xs text-store-muted line-through">
+                              {formatCurrency(product.comparePrice!)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-3">
+                          {product.quantityInStock > 0 ? (
+                            <button
+                              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-store-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-store-accent-hover disabled:opacity-50"
+                              disabled={addingToCart === product.id}
+                              onClick={() => handleAddToCart(product)}
+                            >
+                              <ShoppingCart className="size-3.5" />
+                              {addingToCart === product.id
+                                ? "Adding..."
+                                : "Add to Cart"}
+                            </button>
+                          ) : (
+                            <span className="flex w-full items-center justify-center rounded-full border border-store-muted/40 px-4 py-2 text-xs font-medium text-store-muted">
+                              Out of Stock
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </Link>
-
-                    {/* Image floats absolutely in the background like the homepage */}
-                    <Link href={`/shop/${product.slug}`} className="absolute bottom-[20%] left-1/2 -translate-x-1/2 w-[85%] h-[50%] flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-2 pointer-events-none">
-                      {product.images && product.images.length > 0 ? (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.images[0].altText || product.name}
-                          className="max-h-full object-contain mix-blend-multiply drop-shadow-xl"
-                        />
-                      ) : (
-                        <Package className="size-24 text-muted-foreground/20" />
-                      )}
-                    </Link>
-
-                    <div className="z-10 mt-auto flex items-center gap-2 w-full pt-4">
-                      {product.quantityInStock > 0 ? (
-                        <Button
-                          className="w-full rounded-full h-11 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-semibold transition-colors duration-300 shadow-none border-none group-hover:shadow-lg group-hover:shadow-primary/20"
-                          disabled={addingToCart === product.id}
-                          onClick={(e) => {
-                             e.preventDefault();
-                             e.stopPropagation();
-                             handleAddToCart(product);
-                          }}
-                        >
-                          {addingToCart === product.id ? "Adding..." : "Add to cart"}
-                        </Button>
-                      ) : (
-                        <Button
-                          className="w-full rounded-full h-11 bg-muted/50 text-muted-foreground font-semibold shadow-none cursor-not-allowed"
-                          disabled
-                        >
-                          Out of stock
-                        </Button>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Pagination */}
@@ -543,7 +629,6 @@ export function ShopClient({
 
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
                         .filter((page) => {
-                          // Show first, last, and pages near current
                           return (
                             page === 1 ||
                             page === totalPages ||
@@ -586,18 +671,19 @@ export function ShopClient({
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Package className="size-16 text-muted-foreground/30" />
-              <h3 className="mt-4 text-lg font-medium">No products found</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <Package className="size-16 text-store-muted/30" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900">
+                No products found
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
                 Try adjusting your search or filter criteria.
               </p>
-              <Button
-                variant="outline"
-                className="mt-4"
+              <button
+                className="mt-4 rounded-full border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                 onClick={clearAllFilters}
               >
                 Clear Filters
-              </Button>
+              </button>
             </div>
           )}
         </div>

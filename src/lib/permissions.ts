@@ -33,8 +33,14 @@ export async function requireRole(role: RoleName) {
   return session;
 }
 
+/** Any admin staff (STAFF, ADMIN, SUPER_ADMIN) */
 export async function requireAdmin() {
   return requireRole("STAFF");
+}
+
+/** ADMIN or SUPER_ADMIN only — STAFF is excluded */
+export async function requireAdminRole() {
+  return requireRole("ADMIN");
 }
 
 export async function requireSuperAdmin() {

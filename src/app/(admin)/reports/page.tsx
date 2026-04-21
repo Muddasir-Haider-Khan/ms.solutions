@@ -1,6 +1,7 @@
 import { getSalesSummary, getInventoryReport } from "@/actions/reports";
 import { ReportCards } from "@/components/admin/report-cards";
 import Link from "next/link";
+import { requireAdminRole } from "@/lib/permissions";
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ export const metadata = {
 };
 
 export default async function ReportsPage() {
+  await requireAdminRole();
   const [salesResult, inventoryResult] = await Promise.all([
     getSalesSummary(),
     getInventoryReport(),
