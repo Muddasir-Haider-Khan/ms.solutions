@@ -3,7 +3,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
-  title: "Multi Solutions Company - Business Management",
+  title: "MS Solutions - Business Management",
   description: "Integrated business management system with inventory, invoicing, and e-commerce",
 };
 

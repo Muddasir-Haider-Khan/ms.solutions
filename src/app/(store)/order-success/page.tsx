@@ -14,7 +14,7 @@ import { getOrder } from "@/actions/store";
 import { formatCurrency, formatDate } from "@/lib/slugs";
 
 export const metadata = {
-  title: "Order Confirmed - Multi Solutions Store",
+  title: "Order Confirmed - MS Solutions",
   description: "Your order has been placed successfully",
 };
 

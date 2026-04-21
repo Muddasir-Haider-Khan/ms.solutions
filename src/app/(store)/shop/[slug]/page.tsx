@@ -23,7 +23,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export const metadata = {
-  title: "Product - Multi Solutions Store",
+  title: "Product - MS Solutions",
   description: "View product details",
 };
 
@@ -255,11 +255,11 @@ export default async function ProductDetailPage({
               </div>
               <div className="grid grid-cols-[100px_1fr]">
                 <span>Ships from</span>
-                <span>Multi Solutions</span>
+                <span>MS Solutions</span>
               </div>
               <div className="grid grid-cols-[100px_1fr]">
                 <span>Sold by</span>
-                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Multi Solutions</span>
+                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">MS Solutions</span>
               </div>
               <div className="grid grid-cols-[100px_1fr]">
                 <span>Returns</span>

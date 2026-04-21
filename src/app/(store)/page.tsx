@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getStoreProducts, getStoreCategories } from "@/actions/store";
 
 export const metadata = {
-  title: "Multi Solutions - Store",
+  title: "MS Solutions - Store",
   description: "Shop premium digital products at competitive prices.",
 };
 

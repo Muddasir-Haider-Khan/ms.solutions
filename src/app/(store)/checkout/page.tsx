@@ -37,47 +37,7 @@ export default async function CheckoutPage() {
           Checkout <span className="text-[18px] text-[#565959]">({cartItems.length} items)</span>
         </h1>
         
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Checkout Form */}
-          <div className="lg:col-span-2">
-            <CheckoutClient />
-          </div>
-
-          {/* Order Summary Sidebar */}
-          <div className="w-full bg-white border border-[#D5D9D9] rounded-lg p-5">
-            <h3 className="font-bold text-[18px] text-[#0F1111] mb-4">Order Summary</h3>
-            
-            <div className="space-y-4 text-[14px] text-[#0F1111]">
-              <div className="flex justify-between">
-                <span>Items:</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Postage & Packing:</span>
-                <span>Calculated at next step</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total before tax:</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2">
-                <span>Tax:</span>
-                <span>Rs. 0</span>
-              </div>
-              
-              <div className="flex justify-between font-bold text-[20px] text-[#B12704] pt-2">
-                <span className="text-[#0F1111] text-[18px]">Order Total:</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-[#D5D9D9]">
-              <div className="bg-[#F0F2F2] p-3 text-[12px] text-[#0F1111] rounded-md border border-[#D5D9D9]">
-                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">How are delivery costs calculated?</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CheckoutClient />
       </div>
     </div>
   );

@@ -48,7 +48,7 @@ export function generateInvoicePDF(data: InvoiceData) {
   doc.setFontSize(22);
   doc.setTextColor(...primary);
   doc.setFont("helvetica", "bold");
-  doc.text(data.businessName || "Multi Solutions Company", margin, y);
+  doc.text(data.businessName || "MS Solutions", margin, y);
   y += 8;
 
   doc.setFontSize(9);
@@ -265,7 +265,7 @@ export function generateInvoicePDF(data: InvoiceData) {
   doc.setTextColor(...secondary);
   doc.setFont("helvetica", "normal");
   doc.text(
-    "Thank you for your business! — Multi Solutions Company",
+    "Thank you for your business! — MS Solutions",
     pageWidth / 2,
     footerY,
     { align: "center" }

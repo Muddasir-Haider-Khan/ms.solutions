@@ -37,17 +37,17 @@ export default async function StoreLayout({
           {/* Left: Brand */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-80">
-              <span className="text-xl font-semibold tracking-tight text-foreground">MS Solutions</span>
+              <img src="/images/logo.png" alt="MS Solutions" className="h-8 w-auto object-contain drop-shadow-sm" />
             </Link>
             
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
               <Link href="/shop" className="hover:text-foreground transition-colors">Store</Link>
-              <Link href="/shop" className="hover:text-foreground transition-colors">Mac</Link>
-              <Link href="/shop" className="hover:text-foreground transition-colors">iPad</Link>
-              <Link href="/shop" className="hover:text-foreground transition-colors">iPhone</Link>
-              <Link href="/shop" className="hover:text-foreground transition-colors">Accessories</Link>
-              <Link href="/shop" className="hover:text-foreground transition-colors">Support</Link>
+              <Link href="/shop?category=mac" className="hover:text-foreground transition-colors">Mac</Link>
+              <Link href="/shop?category=ipad" className="hover:text-foreground transition-colors">iPad</Link>
+              <Link href="/shop?category=iphone" className="hover:text-foreground transition-colors">iPhone</Link>
+              <Link href="/shop?category=accessories" className="hover:text-foreground transition-colors">Accessories</Link>
+              <Link href="/shop?category=support" className="hover:text-foreground transition-colors">Support</Link>
             </nav>
           </div>
 
@@ -86,11 +86,11 @@ export default async function StoreLayout({
             <div className="space-y-3">
               <h3 className="font-semibold text-foreground text-sm">Shop and Learn</h3>
               <ul className="space-y-2">
-                <li><Link href="/" className="hover:underline">Store</Link></li>
-                <li><Link href="/" className="hover:underline">Mac</Link></li>
-                <li><Link href="/" className="hover:underline">iPad</Link></li>
-                <li><Link href="/" className="hover:underline">iPhone</Link></li>
-                <li><Link href="/" className="hover:underline">Accessories</Link></li>
+                <li><Link href="/shop" className="hover:underline">Store</Link></li>
+                <li><Link href="/shop?category=mac" className="hover:underline">Mac</Link></li>
+                <li><Link href="/shop?category=ipad" className="hover:underline">iPad</Link></li>
+                <li><Link href="/shop?category=iphone" className="hover:underline">iPhone</Link></li>
+                <li><Link href="/shop?category=accessories" className="hover:underline">Accessories</Link></li>
               </ul>
             </div>
             
@@ -129,7 +129,7 @@ export default async function StoreLayout({
           </div>
           
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6">
-            <p>Copyright © {new Date().getFullYear()} MS Solutions Inc. All rights reserved.</p>
+            <p className="flex items-center gap-2">Copyright © {new Date().getFullYear()} <img src="/images/logo.png" alt="MS Solutions" className="h-4 w-auto object-contain opacity-70 grayscale" /> Inc. All rights reserved.</p>
             <div className="flex gap-4">
               <Link href="/" className="hover:text-foreground">Privacy Policy</Link>
               <span className="hidden md:inline">|</span>

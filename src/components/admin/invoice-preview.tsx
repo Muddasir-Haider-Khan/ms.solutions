@@ -82,7 +82,7 @@ interface InvoicePreviewProps {
 
 export function InvoicePreview({ invoice, companyInfo }: InvoicePreviewProps) {
   const company = companyInfo || {
-    companyName: "Multi Solutions Company",
+    companyName: "MS Solutions",
     address: "",
     phone: "",
     email: "",
@@ -122,9 +122,7 @@ export function InvoicePreview({ invoice, companyInfo }: InvoicePreviewProps) {
           {/* Header */}
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {company.companyName}
-              </h1>
+              <img src="/images/logo.png" alt="MS Solutions" className="h-12 w-auto object-contain mb-2 print:h-16" />
               {company.address && (
                 <p className="text-sm text-gray-600 mt-1">{company.address}</p>
               )}

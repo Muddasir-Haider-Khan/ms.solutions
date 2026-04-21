@@ -120,7 +120,7 @@ export async function getStoreProducts(params?: {
   };
 
   if (categoryId) {
-    where.categoryId = categoryId;
+    where.category = { slug: categoryId };
   }
 
   if (brand) {
@@ -452,7 +452,7 @@ export async function addToCart(data: {
       });
     }
 
-    revalidatePath("/store/cart");
+    revalidatePath("/cart");
     return { success: true, data: { added: true } };
   } catch (error) {
     const message =
@@ -502,7 +502,7 @@ export async function updateCartItem(data: {
         },
       });
 
-      revalidatePath("/store/cart");
+      revalidatePath("/cart");
       return { success: true, data: { removed: true } };
     }
 
@@ -545,7 +545,7 @@ export async function updateCartItem(data: {
       data: { quantity },
     });
 
-    revalidatePath("/store/cart");
+    revalidatePath("/cart");
     return { success: true, data: { updated: true } };
   } catch (error) {
     const message =
@@ -592,7 +592,7 @@ export async function removeFromCart(data: {
       },
     });
 
-    revalidatePath("/store/cart");
+    revalidatePath("/cart");
     return { success: true, data: { removed: true } };
   } catch (error) {
     const message =
@@ -622,7 +622,7 @@ export async function clearCart() {
       where: { cartId: cart.id },
     });
 
-    revalidatePath("/store/cart");
+    revalidatePath("/cart");
     return { success: true, data: { cleared: true } };
   } catch (error) {
     const message =

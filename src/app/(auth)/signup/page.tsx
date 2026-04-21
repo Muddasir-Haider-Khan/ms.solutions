@@ -6,8 +6,8 @@ import Link from "next/link";
 import { SignupForm } from "@/components/store/signup-form";
 
 export const metadata = {
-  title: "Sign Up - Multi Solutions Store",
-  description: "Create your account to start shopping at Multi Solutions Store",
+  title: "Sign Up - MS Solutions",
+  description: "Create your account to start shopping at MS Solutions",
 };
 
 export default async function SignupPage() {
@@ -28,17 +28,7 @@ export default async function SignupPage() {
         {/* Logo and branding */}
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
-              <Package className="size-6 text-primary-foreground" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-lg font-bold leading-tight">
-                Multi Solutions
-              </span>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                Store
-              </span>
-            </div>
+            <img src="/images/logo.png" alt="MS Solutions" className="h-10 w-auto object-contain" />
           </Link>
         </div>
 

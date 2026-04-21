@@ -1,7 +1,7 @@
 "use client";
 
 import { useGuestCart } from "@/lib/guest-cart";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { ShoppingBag, X, Plus, Minus, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/slugs";
@@ -51,7 +51,7 @@ export function CartDrawer() {
                       <Link href={`/shop/${item.slug}`} className="font-semibold text-[15px] leading-tight line-clamp-2 hover:underline">
                         {item.name}
                       </Link>
-                      <button onClick={() => removeItem(item.productId)} className="text-muted-foreground hover:text-red-500 transition-colors ml-2">
+                      <button onClick={() => removeItem(item.productId, item.variantId)} className="text-muted-foreground hover:text-red-500 transition-colors ml-2">
                         <X className="size-4" />
                       </button>
                     </div>
@@ -59,14 +59,14 @@ export function CartDrawer() {
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center bg-[#F5F5F7] rounded-full p-1 overflow-hidden">
                         <button 
-                          onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
+                          onClick={() => updateQuantity(item.productId, item.variantId, Math.max(1, item.quantity - 1))}
                           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white transition-colors"
                         >
                           <Minus className="size-3" />
                         </button>
                         <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(item.productId, Math.min(item.quantityInStock, item.quantity + 1))}
+                          onClick={() => updateQuantity(item.productId, item.variantId, Math.min(item.quantityInStock, item.quantity + 1))}
                           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white transition-colors"
                         >
                           <Plus className="size-3" />
@@ -98,11 +98,13 @@ export function CartDrawer() {
               </div>
             </div>
             
-            <Link href="/checkout">
-              <Button className="w-full rounded-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_24px_rgba(24,127,244,0.25)] flex items-center justify-center gap-2">
-                Check Out <ArrowRight className="size-5" />
-              </Button>
-            </Link>
+            <SheetClose asChild>
+              <Link href="/checkout">
+                <Button className="w-full rounded-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_24px_rgba(24,127,244,0.25)] flex items-center justify-center gap-2 mt-4">
+                  Check Out <ArrowRight className="size-5" />
+                </Button>
+              </Link>
+            </SheetClose>
           </div>
         )}
       </SheetContent>

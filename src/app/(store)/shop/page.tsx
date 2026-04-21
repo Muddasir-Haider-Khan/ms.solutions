@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export const metadata = {
-  title: "Shop - Multi Solutions Store",
+  title: "Shop - MS Solutions",
   description: "Browse our complete catalog of products.",
 };
 

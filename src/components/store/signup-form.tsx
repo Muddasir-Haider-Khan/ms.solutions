@@ -157,6 +157,7 @@ export function SignupForm() {
                 value={formData.email}
                 onChange={handleChange}
                 className={`pl-9 ${fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                autoComplete="off"
                 required
               />
             </div>
@@ -180,6 +181,7 @@ export function SignupForm() {
                 value={formData.phone}
                 onChange={handleChange}
                 className={`pl-9 ${fieldErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                autoComplete="off"
                 required
               />
             </div>
@@ -201,6 +203,7 @@ export function SignupForm() {
                 value={formData.password}
                 onChange={handleChange}
                 className={`pl-9 pr-10 ${fieldErrors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                autoComplete="new-password"
                 required
               />
               <button

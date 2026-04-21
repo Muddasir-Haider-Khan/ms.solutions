@@ -9,7 +9,7 @@ import { formatCurrency } from "@/lib/slugs";
 import { CartClient } from "./cart-client";
 
 export const metadata = {
-  title: "Cart - Multi Solutions Store",
+  title: "Cart - MS Solutions",
   description: "Review your shopping cart",
 };
 
@@ -34,7 +34,7 @@ export default async function CartPage() {
           <div className="flex-1 bg-white p-8 flex flex-col-reverse md:flex-row items-center md:items-start gap-8">
             <div className="flex-1">
               <h2 className="text-[24px] font-medium text-[#0F1111] mb-2 leading-tight">
-                Your Amazon Cart is empty.
+                Your MS Solutions Cart is empty.
               </h2>
               <p className="text-[14px] text-[#0F1111] mb-6">
                 Your Shopping Cart lives to serve. Give it purpose — fill it with electronics, clothing, books, and more.

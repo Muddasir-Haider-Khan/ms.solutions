@@ -347,7 +347,8 @@ export function ShopClient({
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
+              className="pl-8 min-w-0"
+              maxLength={100}
             />
           </div>
           <Button type="submit" size="default">
