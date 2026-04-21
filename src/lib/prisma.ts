@@ -7,7 +7,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  // Replace sslmode=require with verify-full to silence the pg deprecation warning
+  const connectionString = process.env.DATABASE_URL?.replace(
+    "sslmode=require",
+    "sslmode=verify-full"
+  );
+  const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }

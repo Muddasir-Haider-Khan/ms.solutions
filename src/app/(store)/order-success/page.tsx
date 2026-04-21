@@ -6,10 +6,8 @@ import {
   MessageCircle,
   ClipboardList,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { getOrder } from "@/actions/store";
 import { formatCurrency, formatDate } from "@/lib/slugs";
 
@@ -32,14 +30,19 @@ export default async function OrderSuccessPage({
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <Card className="w-full max-w-md text-center">
           <CardContent className="py-12">
-            <Package className="mx-auto size-12 text-muted-foreground/30" />
-            <h2 className="mt-4 text-lg font-semibold">No order found</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <Package className="mx-auto size-12 text-store-muted/30" />
+            <h2 className="mt-4 text-lg font-semibold text-gray-900">
+              No order found
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
               Invalid or missing order ID.
             </p>
-            <Button className="mt-6" render={<Link href="/shop" />}>
+            <Link
+              href="/shop"
+              className="mt-6 inline-flex items-center rounded-full bg-store-accent px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+            >
               Continue Shopping
-            </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -54,14 +57,19 @@ export default async function OrderSuccessPage({
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <Card className="w-full max-w-md text-center">
           <CardContent className="py-12">
-            <Package className="mx-auto size-12 text-muted-foreground/30" />
-            <h2 className="mt-4 text-lg font-semibold">Order not found</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <Package className="mx-auto size-12 text-store-muted/30" />
+            <h2 className="mt-4 text-lg font-semibold text-gray-900">
+              Order not found
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
               This order may have been removed or doesn&apos;t exist.
             </p>
-            <Button className="mt-6" render={<Link href="/shop" />}>
+            <Link
+              href="/shop"
+              className="mt-6 inline-flex items-center rounded-full bg-store-accent px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+            >
               Continue Shopping
-            </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -98,18 +106,17 @@ export default async function OrderSuccessPage({
     }[];
   };
 
-  // Build WhatsApp re-send URL
   const ownerPhone =
     process.env.NEXT_PUBLIC_OWNER_WHATSAPP_NUMBER || "923000000000";
   const waMessage = encodeURIComponent(
     [
-      `🛒 *Order Follow-up - ${typedOrder.orderNumber}*`,
+      `*Order Follow-up - ${typedOrder.orderNumber}*`,
       ``,
       `Hi! I placed order ${typedOrder.orderNumber} and would like to confirm.`,
       ``,
-      `👤 ${typedOrder.customerName}`,
-      `📞 ${typedOrder.customerPhone || "N/A"}`,
-      `💰 Total: ${formatCurrency(typedOrder.totalAmount)}`,
+      `${typedOrder.customerName}`,
+      `${typedOrder.customerPhone || "N/A"}`,
+      `Total: ${formatCurrency(typedOrder.totalAmount)}`,
     ].join("\n")
   );
   const waUrl = `https://wa.me/${ownerPhone.replace(/[^0-9]/g, "")}?text=${waMessage}`;
@@ -122,12 +129,12 @@ export default async function OrderSuccessPage({
           <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100">
             <CheckCircle className="size-8 text-green-600" />
           </div>
-          <h1 className="text-2xl font-bold md:text-3xl">
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
             {isWhatsApp
-              ? "Order Sent to WhatsApp! 🎉"
-              : "Order Placed Successfully! 🎉"}
+              ? "Order Sent to WhatsApp!"
+              : "Order Placed Successfully!"}
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-gray-500">
             {isWhatsApp
               ? "Complete your order by sending the WhatsApp message. We'll confirm shortly!"
               : "Thank you for your order. We'll process it right away."}
@@ -135,33 +142,28 @@ export default async function OrderSuccessPage({
         </div>
 
         {/* Order Summary Card */}
-        <Card className="mb-6">
+        <Card className="mb-6 border-t-4 border-t-store-success">
           <CardContent className="pt-6">
-            {/* Order Info */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Order Number</p>
-                <p className="font-mono text-lg font-bold">
+                <p className="text-sm text-gray-500">Order Number</p>
+                <p className="font-mono text-lg font-bold text-gray-900">
                   {typedOrder.orderNumber}
                 </p>
               </div>
-              <Badge
-                variant="outline"
-                className="bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-              >
+              <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
                 {typedOrder.status}
-              </Badge>
+              </span>
             </div>
 
             <Separator className="my-4" />
 
-            {/* Items */}
             <div className="space-y-3">
               {typedOrder.items.map((item) => {
                 const image = item.product?.images?.[0];
                 return (
                   <div key={item.id} className="flex gap-3">
-                    <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-store-light-bg">
                       {image ? (
                         <img
                           src={image.url}
@@ -170,24 +172,24 @@ export default async function OrderSuccessPage({
                         />
                       ) : (
                         <div className="flex size-full items-center justify-center">
-                          <Package className="size-5 text-muted-foreground/30" />
+                          <Package className="size-5 text-store-muted/30" />
                         </div>
                       )}
-                      <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                      <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-store-accent text-[10px] font-bold text-white">
                         {item.quantity}
                       </span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium line-clamp-1">
+                      <p className="line-clamp-1 text-sm font-medium text-gray-900">
                         {item.productName}
                       </p>
                       {item.productVariant && (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-gray-400">
                           {item.productVariant.name}
                         </p>
                       )}
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium text-gray-900">
                       {formatCurrency(item.lineTotal)}
                     </span>
                   </div>
@@ -197,57 +199,61 @@ export default async function OrderSuccessPage({
 
             <Separator className="my-4" />
 
-            {/* Totals */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatCurrency(typedOrder.subtotal)}</span>
+                <span className="text-gray-500">Subtotal</span>
+                <span className="text-gray-900">
+                  {formatCurrency(typedOrder.subtotal)}
+                </span>
               </div>
               {typedOrder.shippingFee > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatCurrency(typedOrder.shippingFee)}</span>
+                  <span className="text-gray-500">Shipping</span>
+                  <span className="text-gray-900">
+                    {formatCurrency(typedOrder.shippingFee)}
+                  </span>
                 </div>
               )}
               {typedOrder.taxAmount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>{formatCurrency(typedOrder.taxAmount)}</span>
+                  <span className="text-gray-500">Tax</span>
+                  <span className="text-gray-900">
+                    {formatCurrency(typedOrder.taxAmount)}
+                  </span>
                 </div>
               )}
               <Separator className="my-1" />
               <div className="flex justify-between text-base font-bold">
-                <span>Total</span>
-                <span>{formatCurrency(typedOrder.totalAmount)}</span>
+                <span className="text-gray-900">Total</span>
+                <span className="text-store-accent">
+                  {formatCurrency(typedOrder.totalAmount)}
+                </span>
               </div>
             </div>
 
             <Separator className="my-4" />
 
-            {/* Delivery Info */}
             <div className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <p className="text-muted-foreground">Delivery To</p>
-                <p className="font-medium">{typedOrder.customerName}</p>
+                <p className="text-gray-500">Delivery To</p>
+                <p className="font-medium text-gray-900">
+                  {typedOrder.customerName}
+                </p>
                 {typedOrder.shippingAddress && (
-                  <p className="text-muted-foreground">
-                    {typedOrder.shippingAddress}
-                  </p>
+                  <p className="text-gray-500">{typedOrder.shippingAddress}</p>
                 )}
                 {typedOrder.shippingCity && (
-                  <p className="text-muted-foreground">
-                    {typedOrder.shippingCity}
-                  </p>
+                  <p className="text-gray-500">{typedOrder.shippingCity}</p>
                 )}
               </div>
               <div>
-                <p className="text-muted-foreground">Payment Method</p>
-                <p className="font-medium">
+                <p className="text-gray-500">Payment Method</p>
+                <p className="font-medium text-gray-900">
                   {typedOrder.paymentMethod === "COD"
                     ? "Cash on Delivery"
                     : "Bank Transfer"}
                 </p>
-                <p className="text-muted-foreground">
+                <p className="text-gray-500">
                   Ordered {formatDate(typedOrder.createdAt)}
                 </p>
               </div>
@@ -257,47 +263,40 @@ export default async function OrderSuccessPage({
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          {/* WhatsApp button — always visible */}
-          <Button
-            className="flex-1 gap-2 bg-[#25D366] text-white hover:bg-[#1da851]"
-            size="lg"
-            render={
-              <a href={waUrl} target="_blank" rel="noopener noreferrer" />
-            }
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1da851]"
           >
             <MessageCircle className="size-5" />
             {isWhatsApp ? "Open WhatsApp Again" : "Contact on WhatsApp"}
-          </Button>
+          </a>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1 gap-2"
-            render={<Link href="/account/orders" />}
+          <Link
+            href="/account/orders"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
           >
             <ClipboardList className="size-4" />
             Track My Orders
-          </Button>
+          </Link>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1 gap-2"
-            render={<Link href="/shop" />}
+          <Link
+            href="/shop"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100"
           >
             <ShoppingBag className="size-4" />
             Continue Shopping
-          </Button>
+          </Link>
         </div>
 
-        {/* WhatsApp reminder for WA orders */}
         {isWhatsApp && (
-          <div className="mt-6 rounded-lg border border-green-200 bg-green-50 p-4 text-center dark:border-green-800 dark:bg-green-950/30">
-            <p className="text-sm font-medium text-green-800 dark:text-green-300">
-              📱 Don&apos;t forget to send the WhatsApp message to complete your
+          <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center">
+            <p className="text-sm font-medium text-green-800">
+              Don&apos;t forget to send the WhatsApp message to complete your
               order!
             </p>
-            <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+            <p className="mt-1 text-xs text-green-600">
               Your order is saved as PENDING until we receive your WhatsApp
               confirmation.
             </p>

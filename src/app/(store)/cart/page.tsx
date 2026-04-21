@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ShoppingBag, Package, ArrowRight, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getCart } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
@@ -32,14 +30,16 @@ export default async function CartPage() {
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/shop"
-          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <ArrowLeft className="size-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold md:text-3xl">Shopping Cart</h1>
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+            Shopping Cart
+          </h1>
           {!isEmpty && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-500">
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""} in your
               cart
             </p>
@@ -48,67 +48,72 @@ export default async function CartPage() {
       </div>
 
       {isEmpty ? (
-        /* Empty Cart State */
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex size-20 items-center justify-center rounded-full bg-muted">
-            <ShoppingBag className="size-10 text-muted-foreground" />
+          <div className="flex size-20 items-center justify-center rounded-full bg-store-light-bg">
+            <ShoppingBag className="size-10 text-store-muted" />
           </div>
-          <h2 className="mt-6 text-xl font-semibold">Your cart is empty</h2>
-          <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+          <h2 className="mt-6 text-xl font-semibold text-gray-900">
+            Your cart is empty
+          </h2>
+          <p className="mt-2 max-w-sm text-sm text-gray-500">
             Looks like you have not added anything to your cart yet. Browse our
             products and find something you love.
           </p>
-          <Button className="mt-6" render={<Link href="/shop" />}>
+          <Link
+            href="/shop"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+          >
             Continue Shopping
             <ArrowRight className="size-4" />
-          </Button>
+          </Link>
         </div>
       ) : (
-        /* Cart with items */
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Cart Items */}
           <div className="lg:col-span-2">
             <CartClient cartItems={cartItems} />
           </div>
 
-          {/* Order Summary Sidebar */}
           <div>
-            <Card>
+            <Card className="border-t-4 border-t-store-accent">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle className="text-gray-900">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">
+                  <span className="text-gray-500">
                     Subtotal ({cartItems.length} item
                     {cartItems.length !== 1 ? "s" : ""})
                   </span>
-                  <span className="font-medium">
+                  <span className="font-medium text-gray-900">
                     {formatCurrency(subtotal)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-gray-500">Shipping</span>
+                  <span className="text-xs text-gray-400">
                     Calculated at checkout
                   </span>
                 </div>
                 <Separator />
-                <div className="flex justify-between font-semibold">
+                <div className="flex justify-between text-base font-bold text-gray-900">
                   <span>Estimated Total</span>
-                  <span>{formatCurrency(subtotal)}</span>
+                  <span className="text-store-accent">
+                    {formatCurrency(subtotal)}
+                  </span>
                 </div>
-                <Button className="w-full" render={<Link href="/checkout" />}>
+                <Link
+                  href="/checkout"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+                >
                   Proceed to Checkout
                   <ArrowRight className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  render={<Link href="/shop" />}
+                </Link>
+                <Link
+                  href="/shop"
+                  className="flex w-full items-center justify-center rounded-full border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                 >
                   Continue Shopping
-                </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

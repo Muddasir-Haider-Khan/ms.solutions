@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Minus, Plus, LogIn } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { addToCart } from "@/actions/store";
 import { toast } from "sonner";
@@ -27,7 +26,13 @@ type Product = {
   }>;
 };
 
-export function ProductDetailClient({ product, isAuthenticated = false }: { product: Product; isAuthenticated?: boolean }) {
+export function ProductDetailClient({
+  product,
+  isAuthenticated = false,
+}: {
+  product: Product;
+  isAuthenticated?: boolean;
+}) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
@@ -103,7 +108,7 @@ export function ProductDetailClient({ product, isAuthenticated = false }: { prod
       {/* Variant selection */}
       {product.variants && product.variants.length > 0 && (
         <div>
-          <h3 className="mb-2 text-sm font-semibold">Options</h3>
+          <h3 className="mb-2 text-sm font-semibold text-gray-900">Options</h3>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((variant) => (
               <button
@@ -112,16 +117,16 @@ export function ProductDetailClient({ product, isAuthenticated = false }: { prod
                   setSelectedVariantId(variant.id);
                   setQuantity(1);
                 }}
-                className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
+                className={`rounded-full border px-4 py-2 text-sm transition-all ${
                   selectedVariantId === variant.id
-                    ? "border-primary bg-primary/5 text-primary ring-1 ring-primary"
-                    : "border-input hover:border-primary/50"
+                    ? "border-store-accent bg-store-accent-light text-store-accent ring-1 ring-store-accent"
+                    : "border-gray-300 text-gray-700 hover:border-store-accent/50"
                 } ${!variant.isActive ? "cursor-not-allowed opacity-50" : ""}`}
                 disabled={!variant.isActive}
               >
                 {variant.name}
                 {variant.sellingPrice !== null && (
-                  <span className="ml-1 text-xs text-muted-foreground">
+                  <span className="ml-1 text-xs text-gray-400">
                     (+{variant.sellingPrice})
                   </span>
                 )}
@@ -133,17 +138,16 @@ export function ProductDetailClient({ product, isAuthenticated = false }: { prod
 
       {/* Quantity selector */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Quantity</h3>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg border">
-            <Button
-              variant="ghost"
-              size="icon-sm"
+        <h3 className="mb-2 text-sm font-semibold text-gray-900">Quantity</h3>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-full border border-gray-300">
+            <button
               onClick={decrementQuantity}
               disabled={quantity <= 1}
+              className="flex size-9 items-center justify-center rounded-l-full text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-30"
             >
-              <Minus className="size-3" />
-            </Button>
+              <Minus className="size-3.5" />
+            </button>
             <Input
               type="number"
               value={quantity}
@@ -151,23 +155,20 @@ export function ProductDetailClient({ product, isAuthenticated = false }: { prod
                 const val = parseInt(e.target.value);
                 if (val > 0) setQuantity(val);
               }}
-              className="h-7 w-14 border-0 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="h-9 w-14 border-0 text-center text-sm font-medium [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               min={1}
               max={availableStock || undefined}
             />
-            <Button
-              variant="ghost"
-              size="icon-sm"
+            <button
               onClick={incrementQuantity}
-              disabled={
-                product.trackInventory && quantity >= availableStock
-              }
+              disabled={product.trackInventory && quantity >= availableStock}
+              className="flex size-9 items-center justify-center rounded-r-full text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-30"
             >
-              <Plus className="size-3" />
-            </Button>
+              <Plus className="size-3.5" />
+            </button>
           </div>
           {product.trackInventory && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-gray-400">
               {availableStock} available
             </span>
           )}
@@ -177,48 +178,42 @@ export function ProductDetailClient({ product, isAuthenticated = false }: { prod
       {/* Action buttons */}
       {!isAuthenticated ? (
         <div className="space-y-3 pt-2">
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             Please sign in to add items to your cart
           </div>
           <div className="flex gap-3">
-            <Button
-              size="lg"
-              className="flex-1"
-              render={<Link href={`/customer-login?callbackUrl=/shop/${product.slug}`} />}
+            <Link
+              href={`/customer-login?callbackUrl=/shop/${product.slug}`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
             >
               <LogIn className="size-4" />
               Sign In
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="flex-1"
-              render={<Link href="/signup" />}
+            </Link>
+            <Link
+              href="/signup"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100"
             >
               Create Account
-            </Button>
+            </Link>
           </div>
         </div>
       ) : (
         <div className="flex gap-3 pt-2">
-          <Button
-            size="lg"
-            className="flex-1"
+          <button
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover disabled:opacity-50"
             disabled={!isInStock || isPending}
             onClick={handleAddToCart}
           >
             <ShoppingCart className="size-4" />
             {isPending ? "Adding..." : "Add to Cart"}
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="flex-1"
+          </button>
+          <button
+            className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-store-accent px-6 py-3 text-sm font-semibold text-store-accent transition-colors hover:bg-store-accent-light disabled:opacity-50"
             disabled={!isInStock || isPending}
             onClick={handleBuyNow}
           >
             Buy Now
-          </Button>
+          </button>
         </div>
       )}
     </div>

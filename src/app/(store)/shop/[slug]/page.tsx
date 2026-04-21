@@ -2,18 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   Package,
-  ShoppingCart,
-  Minus,
-  Plus,
-  ArrowLeft,
-  Share2,
   Truck,
   Shield,
   RotateCcw,
+  ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getStoreProduct, getRelatedProducts } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
@@ -35,7 +28,7 @@ export default async function ProductDetailPage({
 
   const [productResult, relatedResult, session] = await Promise.all([
     getStoreProduct(slug),
-    getRelatedProducts("", undefined), // We'll get related after knowing the product
+    getRelatedProducts("", undefined),
     getServerSession(authOptions),
   ]);
 
@@ -45,13 +38,18 @@ export default async function ProductDetailPage({
 
   const product = productResult.data;
 
-  // Get related products now that we know the category
-  let relatedProducts: { id: string; name: string; slug: string; sellingPrice: number; comparePrice: number | null; images: { url: string }[] }[] = [];
+  let relatedProducts: {
+    id: string;
+    name: string;
+    slug: string;
+    sellingPrice: number;
+    comparePrice: number | null;
+    images: { url: string }[];
+  }[] = [];
   if (relatedResult.success && relatedResult.data) {
     relatedProducts = relatedResult.data;
   }
 
-  // Re-fetch related with the correct category
   const relatedWithCategory = await getRelatedProducts(
     product.id,
     product.categoryId ?? undefined
@@ -63,37 +61,46 @@ export default async function ProductDetailPage({
   const mainImage =
     product.images && product.images.length > 0 ? product.images[0] : null;
 
+  const hasDiscount =
+    product.comparePrice && product.comparePrice > product.sellingPrice;
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((product.comparePrice! - product.sellingPrice) /
+          product.comparePrice!) *
+          100
+      )
+    : 0;
+
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-500">
+        <Link href="/" className="transition-colors hover:text-store-accent">
           Home
         </Link>
-        <span>/</span>
-        <Link href="/shop" className="hover:text-foreground transition-colors">
+        <ChevronRight className="size-3.5 text-gray-400" />
+        <Link href="/shop" className="transition-colors hover:text-store-accent">
           Shop
         </Link>
         {product.category && (
           <>
-            <span>/</span>
+            <ChevronRight className="size-3.5 text-gray-400" />
             <Link
               href={`/shop?category=${product.category.id}`}
-              className="hover:text-foreground transition-colors"
+              className="transition-colors hover:text-store-accent"
             >
               {product.category.name}
             </Link>
           </>
         )}
-        <span>/</span>
-        <span className="text-foreground">{product.name}</span>
+        <ChevronRight className="size-3.5 text-gray-400" />
+        <span className="font-medium text-store-accent">{product.name}</span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Product Images */}
         <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
+          <div className="relative aspect-square overflow-hidden rounded-2xl bg-store-light-bg">
             {mainImage ? (
               <img
                 src={mainImage.url}
@@ -102,33 +109,23 @@ export default async function ProductDetailPage({
               />
             ) : (
               <div className="flex size-full items-center justify-center">
-                <Package className="size-24 text-muted-foreground/30" />
+                <Package className="size-24 text-store-muted/30" />
               </div>
             )}
-            {product.comparePrice &&
-              product.comparePrice > product.sellingPrice && (
-                <Badge
-                  variant="destructive"
-                  className="absolute right-3 top-3"
-                >
-                  -
-                  {Math.round(
-                    ((product.comparePrice - product.sellingPrice) /
-                      product.comparePrice) *
-                      100
-                  )}
-                  % OFF
-                </Badge>
-              )}
+            {hasDiscount && (
+              <span className="absolute right-4 top-4 rounded-lg bg-store-sale px-3 py-1 text-sm font-bold text-white">
+                -{discountPercent}% OFF
+              </span>
+            )}
           </div>
 
           {/* Thumbnail Gallery */}
           {product.images && product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2.5 overflow-x-auto pb-1">
               {product.images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/10"
+                  className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-store-light-bg ring-2 ring-transparent transition-all hover:ring-store-accent"
                 >
                   <img
                     src={image.url}
@@ -144,92 +141,111 @@ export default async function ProductDetailPage({
         {/* Product Info */}
         <div className="flex flex-col">
           {product.category && (
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <Link
+              href={`/shop?category=${product.category.id}`}
+              className="text-xs font-semibold uppercase tracking-wider text-store-accent"
+            >
               {product.category.name}
-            </p>
+            </Link>
           )}
 
-          <h1 className="mt-1 text-2xl font-bold md:text-3xl">
+          <h1 className="mt-1 text-2xl font-bold text-gray-900 md:text-3xl">
             {product.name}
           </h1>
 
           {product.brand && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Brand: <span className="font-medium">{product.brand}</span>
+            <p className="mt-1 text-sm text-gray-500">
+              Brand:{" "}
+              <span className="font-medium text-gray-700">{product.brand}</span>
             </p>
           )}
 
           <div className="mt-2 flex items-center gap-1">
-            <span className="text-xs text-muted-foreground">SKU:</span>
-            <span className="text-xs font-mono text-muted-foreground">
+            <span className="text-xs text-gray-400">SKU:</span>
+            <span className="font-mono text-xs text-gray-400">
               {product.sku}
             </span>
           </div>
 
           {/* Price */}
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-primary">
+            <span className="text-3xl font-bold text-store-accent">
               {formatCurrency(product.sellingPrice)}
             </span>
-            {product.comparePrice &&
-              product.comparePrice > product.sellingPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  {formatCurrency(product.comparePrice)}
+            {hasDiscount && (
+              <>
+                <span className="text-lg text-store-muted line-through">
+                  {formatCurrency(product.comparePrice!)}
                 </span>
-              )}
+                <span className="rounded-md bg-store-sale/10 px-2 py-0.5 text-xs font-bold text-store-sale">
+                  Save {discountPercent}%
+                </span>
+              </>
+            )}
           </div>
 
           {/* Stock Status */}
           <div className="mt-3">
             {product.quantityInStock > 0 ? (
-              <Badge variant="secondary" className="gap-1">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
                 <span className="size-1.5 rounded-full bg-green-500" />
                 In Stock ({product.quantityInStock} available)
-              </Badge>
+              </span>
             ) : (
-              <Badge variant="destructive" className="gap-1">
-                <span className="size-1.5 rounded-full bg-destructive" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
+                <span className="size-1.5 rounded-full bg-red-500" />
                 Out of Stock
-              </Badge>
+              </span>
             )}
           </div>
 
-          <Separator className="my-4" />
+          <Separator className="my-5" />
 
           {/* Description */}
           {product.shortDescription && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm leading-relaxed text-gray-600">
               {product.shortDescription}
             </p>
           )}
 
           {product.description && (
             <div className="mt-4">
-              <h3 className="text-sm font-semibold">Description</h3>
-              <div className="mt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+              <h3 className="text-sm font-semibold text-gray-900">
+                Description
+              </h3>
+              <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-gray-500">
                 {product.description}
               </div>
             </div>
           )}
 
-          <Separator className="my-4" />
+          <Separator className="my-5" />
 
-          {/* Add to Cart section - Client Component */}
-          <ProductDetailClient product={product} isAuthenticated={!!session?.user} />
+          {/* Add to Cart section */}
+          <ProductDetailClient
+            product={product}
+            isAuthenticated={!!session?.user}
+          />
 
           {/* Trust badges */}
           <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <Truck className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Fast Delivery</span>
+            <div className="flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors hover:border-store-accent/30">
+              <Truck className="size-5 text-store-accent" />
+              <span className="text-[10px] font-semibold text-gray-700">
+                Fast Delivery
+              </span>
             </div>
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <Shield className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Secure Payment</span>
+            <div className="flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors hover:border-store-accent/30">
+              <Shield className="size-5 text-store-accent" />
+              <span className="text-[10px] font-semibold text-gray-700">
+                Secure Payment
+              </span>
             </div>
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <RotateCcw className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Easy Returns</span>
+            <div className="flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors hover:border-store-accent/30">
+              <RotateCcw className="size-5 text-store-accent" />
+              <span className="text-[10px] font-semibold text-gray-700">
+                Easy Returns
+              </span>
             </div>
           </div>
         </div>
@@ -238,35 +254,55 @@ export default async function ProductDetailPage({
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-6 text-xl font-bold">Related Products</h2>
+          <h2 className="mb-6 text-xl font-bold text-gray-900">
+            Related Products
+          </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {relatedProducts.map((related) => (
-              <Link key={related.id} href={`/shop/${related.slug}`}>
-                <Card className="group h-full overflow-hidden transition-all hover:shadow-md hover:ring-1 hover:ring-primary/20">
-                  <div className="aspect-square overflow-hidden bg-muted">
-                    {related.images && related.images.length > 0 ? (
-                      <img
-                        src={related.images[0].url}
-                        alt={related.name}
-                        className="size-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex size-full items-center justify-center">
-                        <Package className="size-10 text-muted-foreground/30" />
-                      </div>
-                    )}
+            {relatedProducts.map((related) => {
+              const relHasDiscount =
+                related.comparePrice &&
+                related.comparePrice > related.sellingPrice;
+              const relDiscountPercent = relHasDiscount
+                ? Math.round(
+                    ((related.comparePrice! - related.sellingPrice) /
+                      related.comparePrice!) *
+                      100
+                  )
+                : 0;
+
+              return (
+                <Link key={related.id} href={`/shop/${related.slug}`}>
+                  <div className="group overflow-hidden rounded-xl border bg-white transition-all duration-200 hover:shadow-lg hover:shadow-black/8">
+                    <div className="relative aspect-square overflow-hidden bg-store-light-bg">
+                      {related.images && related.images.length > 0 ? (
+                        <img
+                          src={related.images[0].url}
+                          alt={related.name}
+                          className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex size-full items-center justify-center">
+                          <Package className="size-10 text-store-muted/30" />
+                        </div>
+                      )}
+                      {relHasDiscount && (
+                        <span className="absolute right-2.5 top-2.5 rounded-md bg-store-sale px-2 py-0.5 text-[11px] font-bold text-white">
+                          -{relDiscountPercent}%
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-3.5">
+                      <h3 className="line-clamp-1 text-sm font-medium text-gray-900">
+                        {related.name}
+                      </h3>
+                      <span className="mt-1 block text-base font-bold text-store-accent">
+                        {formatCurrency(related.sellingPrice)}
+                      </span>
+                    </div>
                   </div>
-                  <CardContent className="p-3">
-                    <h3 className="line-clamp-1 text-sm font-medium">
-                      {related.name}
-                    </h3>
-                    <span className="mt-1 block text-sm font-bold text-primary">
-                      {formatCurrency(related.sellingPrice)}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

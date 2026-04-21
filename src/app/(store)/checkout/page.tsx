@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getCart } from "@/actions/store";
@@ -35,32 +34,29 @@ export default async function CheckoutPage() {
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/cart"
-          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <ArrowLeft className="size-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold md:text-3xl">Checkout</h1>
-          <p className="text-sm text-muted-foreground">
-            Complete your order details
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+            Checkout
+          </h1>
+          <p className="text-sm text-gray-500">Complete your order details</p>
         </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Checkout Form */}
         <div className="lg:col-span-2">
           <CheckoutClient />
         </div>
 
-        {/* Order Summary Sidebar */}
         <div>
-          <Card>
+          <Card className="border-t-4 border-t-store-accent">
             <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
+              <CardTitle className="text-gray-900">Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Cart items preview */}
               <div className="space-y-3">
                 {cartItems.map((item) => {
                   const price =
@@ -70,7 +66,7 @@ export default async function CheckoutPage() {
 
                   return (
                     <div key={item.id} className="flex gap-3">
-                      <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+                      <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-store-light-bg">
                         {image ? (
                           <img
                             src={image.url}
@@ -79,24 +75,24 @@ export default async function CheckoutPage() {
                           />
                         ) : (
                           <div className="flex size-full items-center justify-center">
-                            <Package className="size-5 text-muted-foreground/30" />
+                            <Package className="size-5 text-store-muted/30" />
                           </div>
                         )}
-                        <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                        <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-store-accent text-[10px] font-bold text-white">
                           {item.quantity}
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium line-clamp-1">
+                        <p className="line-clamp-1 text-sm font-medium text-gray-900">
                           {item.product.name}
                         </p>
                         {item.productVariant && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-gray-400">
                             {item.productVariant.name}
                           </p>
                         )}
                       </div>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-medium text-gray-900">
                         {formatCurrency(price * item.quantity)}
                       </span>
                     </div>
@@ -108,12 +104,14 @@ export default async function CheckoutPage() {
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatCurrency(subtotal)}</span>
+                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-900">
+                    {formatCurrency(subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-gray-500">Shipping</span>
+                  <span className="text-xs text-gray-400">
                     Calculated at next step
                   </span>
                 </div>
@@ -121,9 +119,11 @@ export default async function CheckoutPage() {
 
               <Separator />
 
-              <div className="flex justify-between font-semibold">
-                <span>Estimated Total</span>
-                <span>{formatCurrency(subtotal)}</span>
+              <div className="flex justify-between text-base font-bold">
+                <span className="text-gray-900">Estimated Total</span>
+                <span className="text-store-accent">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
             </CardContent>
           </Card>

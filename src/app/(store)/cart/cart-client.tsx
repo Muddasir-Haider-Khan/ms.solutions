@@ -4,10 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Package, Trash2, Minus, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { updateCartItem, removeFromCart } from "@/actions/store";
 import { formatCurrency } from "@/lib/slugs";
 import { toast } from "sonner";
@@ -89,10 +86,9 @@ export function CartClient({ cartItems }: { cartItems: CartItemData[] }) {
         return (
           <Card key={item.id} className="overflow-hidden">
             <div className="flex gap-4 p-4">
-              {/* Product Image */}
               <Link
                 href={`/shop/${item.product.slug}`}
-                className="size-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:size-24"
+                className="size-20 shrink-0 overflow-hidden rounded-xl bg-store-light-bg sm:size-24"
               >
                 {image ? (
                   <img
@@ -102,46 +98,43 @@ export function CartClient({ cartItems }: { cartItems: CartItemData[] }) {
                   />
                 ) : (
                   <div className="flex size-full items-center justify-center">
-                    <Package className="size-8 text-muted-foreground/30" />
+                    <Package className="size-8 text-store-muted/30" />
                   </div>
                 )}
               </Link>
 
-              {/* Product Info */}
               <div className="flex flex-1 flex-col justify-between">
                 <div>
                   <Link href={`/shop/${item.product.slug}`}>
-                    <h3 className="text-sm font-medium hover:text-primary sm:text-base">
+                    <h3 className="text-sm font-medium text-gray-900 hover:text-store-accent sm:text-base">
                       {item.product.name}
                     </h3>
                   </Link>
                   {item.productVariant && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-gray-400">
                       {item.productVariant.name}
                     </p>
                   )}
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-xs text-gray-400">
                     SKU: {item.productVariant?.sku || item.product.sku}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">
+                    <span className="text-sm font-bold text-store-accent">
                       {formatCurrency(price)}
                     </span>
                     {item.product.comparePrice &&
                       item.product.comparePrice > price && (
-                        <span className="text-xs text-muted-foreground line-through">
+                        <span className="text-xs text-store-muted line-through">
                           {formatCurrency(item.product.comparePrice)}
                         </span>
                       )}
                   </div>
                 </div>
 
-                {/* Quantity and Actions */}
                 <div className="mt-2 flex items-center justify-between">
-                  <div className="flex items-center rounded-lg border">
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
+                  <div className="flex items-center rounded-full border border-gray-300">
+                    <button
+                      className="flex size-8 items-center justify-center rounded-l-full text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-30"
                       onClick={() =>
                         handleQuantityChange(
                           item.productId,
@@ -152,13 +145,12 @@ export function CartClient({ cartItems }: { cartItems: CartItemData[] }) {
                       disabled={item.quantity <= 1 || isPending}
                     >
                       <Minus className="size-3" />
-                    </Button>
+                    </button>
                     <span className="min-w-[2rem] text-center text-sm font-medium">
                       {item.quantity}
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
+                    <button
+                      className="flex size-8 items-center justify-center rounded-r-full text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-30"
                       onClick={() =>
                         handleQuantityChange(
                           item.productId,
@@ -169,24 +161,22 @@ export function CartClient({ cartItems }: { cartItems: CartItemData[] }) {
                       disabled={isPending}
                     >
                       <Plus className="size-3" />
-                    </Button>
+                    </button>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold">
+                    <span className="text-sm font-bold text-gray-900">
                       {formatCurrency(lineTotal)}
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      className="text-muted-foreground hover:text-destructive"
+                    <button
+                      className="flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
                       onClick={() =>
                         handleRemoveItem(item.productId, item.variantId)
                       }
                       disabled={isPending}
                     >
                       <Trash2 className="size-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>

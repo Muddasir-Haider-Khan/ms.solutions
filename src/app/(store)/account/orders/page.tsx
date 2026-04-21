@@ -8,9 +8,7 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { getCustomerOrders } from "@/actions/store";
 import { formatCurrency, formatDate } from "@/lib/slugs";
 import { getServerSession } from "next-auth";
@@ -21,38 +19,35 @@ export const metadata = {
   description: "Track your orders and view order history",
 };
 
-const statusConfig: Record<string, { color: string; icon: React.ElementType }> =
-  {
-    PENDING: {
-      color:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-      icon: Clock,
-    },
-    CONFIRMED: {
-      color:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-      icon: CheckCircle2,
-    },
-    PROCESSING: {
-      color:
-        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-      icon: Package,
-    },
-    SHIPPED: {
-      color:
-        "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
-      icon: Truck,
-    },
-    DELIVERED: {
-      color:
-        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      icon: CheckCircle2,
-    },
-    CANCELLED: {
-      color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-      icon: XCircle,
-    },
-  };
+const statusConfig: Record<
+  string,
+  { color: string; icon: React.ElementType }
+> = {
+  PENDING: {
+    color: "bg-yellow-100 text-yellow-700",
+    icon: Clock,
+  },
+  CONFIRMED: {
+    color: "bg-blue-100 text-blue-700",
+    icon: CheckCircle2,
+  },
+  PROCESSING: {
+    color: "bg-purple-100 text-purple-700",
+    icon: Package,
+  },
+  SHIPPED: {
+    color: "bg-indigo-100 text-indigo-700",
+    icon: Truck,
+  },
+  DELIVERED: {
+    color: "bg-green-100 text-green-700",
+    icon: CheckCircle2,
+  },
+  CANCELLED: {
+    color: "bg-red-100 text-red-700",
+    icon: XCircle,
+  },
+};
 
 export default async function CustomerOrdersPage() {
   const session = await getServerSession(authOptions);
@@ -66,10 +61,11 @@ export default async function CustomerOrdersPage() {
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       <div className="mx-auto max-w-3xl">
-        {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold md:text-3xl">My Orders</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+            My Orders
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
             Track and manage your order history
           </p>
         </div>
@@ -77,14 +73,19 @@ export default async function CustomerOrdersPage() {
         {orders.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <ShoppingBag className="size-16 text-muted-foreground/20" />
-              <h3 className="mt-4 text-lg font-semibold">No orders yet</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <ShoppingBag className="size-16 text-store-muted/20" />
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                No orders yet
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
                 Start shopping to see your orders here!
               </p>
-              <Button className="mt-6" render={<Link href="/shop" />}>
+              <Link
+                href="/shop"
+                className="mt-6 inline-flex items-center rounded-full bg-store-accent px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover"
+              >
                 Browse Products
-              </Button>
+              </Link>
             </CardContent>
           </Card>
         ) : (
@@ -95,19 +96,18 @@ export default async function CustomerOrdersPage() {
 
               return (
                 <Link key={order.id} href={`/account/orders/${order.id}`}>
-                  <Card className="transition-all hover:shadow-md hover:border-primary/20">
+                  <Card className="transition-all hover:shadow-md hover:border-store-accent/20">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        {/* Left: Order info */}
                         <div className="flex items-center gap-4">
-                          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
-                            <Icon className="size-5 text-muted-foreground" />
+                          <div className="flex size-12 items-center justify-center rounded-xl bg-store-accent-light">
+                            <Icon className="size-5 text-store-accent" />
                           </div>
                           <div>
-                            <p className="font-mono text-sm font-bold">
+                            <p className="font-mono text-sm font-bold text-gray-900">
                               {order.orderNumber}
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-gray-500">
                               {formatDate(order.createdAt)} ·{" "}
                               {order._count.items} item
                               {order._count.items !== 1 ? "s" : ""}
@@ -115,15 +115,13 @@ export default async function CustomerOrdersPage() {
                           </div>
                         </div>
 
-                        {/* Right: Status and total */}
                         <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
-                          <Badge
-                            variant="outline"
-                            className={`text-xs ${config.color}`}
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${config.color}`}
                           >
                             {order.status}
-                          </Badge>
-                          <span className="text-lg font-bold">
+                          </span>
+                          <span className="text-lg font-bold text-store-accent">
                             {formatCurrency(order.totalAmount)}
                           </span>
                         </div>

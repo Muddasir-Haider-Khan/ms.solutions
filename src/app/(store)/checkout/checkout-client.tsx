@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,19 +18,19 @@ function buildWhatsAppMessage(
   totalAmount: number
 ) {
   const lines = [
-    `🛒 *New Order - ${orderNumber}*`,
+    `*New Order - ${orderNumber}*`,
     ``,
-    `👤 *Customer:* ${formData.customerName}`,
-    `📞 *Phone:* ${formData.customerPhone}`,
-    formData.customerEmail ? `📧 *Email:* ${formData.customerEmail}` : "",
+    `*Customer:* ${formData.customerName}`,
+    `*Phone:* ${formData.customerPhone}`,
+    formData.customerEmail ? `*Email:* ${formData.customerEmail}` : "",
     ``,
-    `📍 *Delivery Address:*`,
+    `*Delivery Address:*`,
     `${formData.shippingAddress}`,
     `${formData.shippingCity}`,
     ``,
-    `💰 *Total:* ${formatCurrency(totalAmount)}`,
-    `💳 *Payment:* ${formData.paymentMethod === "COD" ? "Cash on Delivery" : "Bank Transfer"}`,
-    formData.notes ? `\n📝 *Notes:* ${formData.notes}` : "",
+    `*Total:* ${formatCurrency(totalAmount)}`,
+    `*Payment:* ${formData.paymentMethod === "COD" ? "Cash on Delivery" : "Bank Transfer"}`,
+    formData.notes ? `\n*Notes:* ${formData.notes}` : "",
     ``,
     `---`,
     `_Sent via Multi Solutions Store_`,
@@ -86,7 +85,6 @@ export function CheckoutClient() {
     return true;
   }
 
-  // Standard order placement
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validateForm()) return;
@@ -108,7 +106,6 @@ export function CheckoutClient() {
     });
   }
 
-  // WhatsApp order: save to DB first, then redirect to wa.me
   async function handleWhatsAppOrder() {
     if (!validateForm()) return;
 
@@ -122,8 +119,8 @@ export function CheckoutClient() {
           totalAmount: number;
         };
 
-        // Build WhatsApp message
-        const ownerPhone = process.env.NEXT_PUBLIC_OWNER_WHATSAPP_NUMBER || "923000000000";
+        const ownerPhone =
+          process.env.NEXT_PUBLIC_OWNER_WHATSAPP_NUMBER || "923000000000";
         const message = buildWhatsAppMessage(
           orderData.orderNumber,
           formData,
@@ -131,10 +128,8 @@ export function CheckoutClient() {
         );
         const waUrl = getWhatsAppUrl(ownerPhone, message);
 
-        // Open WhatsApp in new tab
         window.open(waUrl, "_blank");
 
-        // Then navigate to success page
         router.push(
           `/order-success?orderId=${orderData.orderId}&whatsapp=true`
         );
@@ -154,16 +149,15 @@ export function CheckoutClient() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Shipping Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Shipping Information</CardTitle>
+          <CardTitle className="text-gray-900">Shipping Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="customerName">
-                Full Name <span className="text-destructive">*</span>
+                Full Name <span className="text-store-sale">*</span>
               </Label>
               <Input
                 id="customerName"
@@ -189,7 +183,7 @@ export function CheckoutClient() {
 
           <div className="space-y-2">
             <Label htmlFor="customerPhone">
-              Phone Number <span className="text-destructive">*</span>
+              Phone Number <span className="text-store-sale">*</span>
             </Label>
             <Input
               id="customerPhone"
@@ -204,7 +198,7 @@ export function CheckoutClient() {
 
           <div className="space-y-2">
             <Label htmlFor="shippingAddress">
-              Shipping Address <span className="text-destructive">*</span>
+              Shipping Address <span className="text-store-sale">*</span>
             </Label>
             <Textarea
               id="shippingAddress"
@@ -219,7 +213,7 @@ export function CheckoutClient() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="shippingCity">
-                City <span className="text-destructive">*</span>
+                City <span className="text-store-sale">*</span>
               </Label>
               <Input
                 id="shippingCity"
@@ -246,36 +240,38 @@ export function CheckoutClient() {
         </CardContent>
       </Card>
 
-      {/* Payment Method */}
       <Card>
         <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
+          <CardTitle className="text-gray-900">Payment Method</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup
             value={formData.paymentMethod}
             onValueChange={(value: string | null) =>
-              setFormData((prev) => ({ ...prev, paymentMethod: value ?? "COD" }))
+              setFormData((prev) => ({
+                ...prev,
+                paymentMethod: value ?? "COD",
+              }))
             }
           >
-            <div className="flex items-start gap-3 rounded-lg border p-4">
+            <div className="flex items-start gap-3 rounded-xl border p-4 transition-colors hover:border-store-accent/30">
               <RadioGroupItem value="COD" id="cod" />
               <div className="flex-1">
                 <Label htmlFor="cod" className="cursor-pointer font-medium">
                   Cash on Delivery (COD)
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-500">
                   Pay when your order arrives at your doorstep
                 </p>
               </div>
             </div>
-            <div className="mt-3 flex items-start gap-3 rounded-lg border p-4">
+            <div className="mt-3 flex items-start gap-3 rounded-xl border p-4 transition-colors hover:border-store-accent/30">
               <RadioGroupItem value="BANK_TRANSFER" id="bank" />
               <div className="flex-1">
                 <Label htmlFor="bank" className="cursor-pointer font-medium">
                   Bank Transfer
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-500">
                   Transfer payment directly to our bank account. Order will be
                   confirmed after payment verification.
                 </p>
@@ -285,13 +281,10 @@ export function CheckoutClient() {
         </CardContent>
       </Card>
 
-      {/* Submit Buttons */}
       <div className="flex flex-col gap-3">
-        {/* WhatsApp Order — Primary CTA */}
-        <Button
+        <button
           type="button"
-          size="lg"
-          className="w-full gap-2 bg-[#25D366] text-white hover:bg-[#1da851] focus-visible:ring-[#25D366]"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#1da851] disabled:opacity-50"
           onClick={handleWhatsAppOrder}
           disabled={isLoading}
         >
@@ -306,14 +299,11 @@ export function CheckoutClient() {
               Order via WhatsApp
             </>
           )}
-        </Button>
+        </button>
 
-        {/* Standard Order — Secondary CTA */}
-        <Button
+        <button
           type="submit"
-          size="lg"
-          variant="outline"
-          className="w-full"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-store-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-store-accent-hover disabled:opacity-50"
           disabled={isLoading}
         >
           {isPending ? (
@@ -324,10 +314,11 @@ export function CheckoutClient() {
           ) : (
             "Place Order (Standard)"
           )}
-        </Button>
+        </button>
 
-        <p className="text-center text-xs text-muted-foreground">
-          💬 WhatsApp order lets you confirm directly with us — fastest way to order!
+        <p className="text-center text-xs text-gray-400">
+          WhatsApp order lets you confirm directly with us — fastest way to
+          order!
         </p>
       </div>
     </form>

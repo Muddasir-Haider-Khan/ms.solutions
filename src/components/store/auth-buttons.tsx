@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { User, LogOut, ShoppingBag, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 type AuthButtonsProps = {
   user: {
@@ -18,7 +17,6 @@ export function AuthButtons({ user }: AuthButtonsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -32,19 +30,18 @@ export function AuthButtons({ user }: AuthButtonsProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Guest state — show Login & Signup buttons
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <Link
           href="/customer-login"
-          className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="flex h-8 items-center gap-1.5 rounded-full bg-store-accent px-3.5 text-xs font-semibold text-white transition-colors hover:bg-store-accent-hover"
         >
           Sign Up
         </Link>
@@ -52,7 +49,6 @@ export function AuthButtons({ user }: AuthButtonsProps) {
     );
   }
 
-  // Authenticated state — show user dropdown
   const initials = user.name
     .split(" ")
     .map((w) => w[0])
@@ -64,35 +60,33 @@ export function AuthButtons({ user }: AuthButtonsProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex h-8 items-center gap-1.5 rounded-lg px-2 text-sm transition-colors hover:bg-muted"
+        className="flex h-8 items-center gap-1.5 rounded-full px-2 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
       >
-        <div className="flex size-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+        <div className="flex size-6 items-center justify-center rounded-full bg-store-accent text-[10px] font-bold text-white">
           {initials}
         </div>
-        <span className="hidden text-xs font-medium sm:block max-w-[100px] truncate">
+        <span className="hidden max-w-[100px] truncate text-xs font-medium sm:block">
           {user.name}
         </span>
         <ChevronDown
-          className={`size-3 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+          className={`size-3 text-white/50 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {dropdownOpen && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-xl border bg-background shadow-lg shadow-black/10 animate-in fade-in-0 zoom-in-95">
-          {/* User info */}
+        <div className="absolute right-0 top-full z-50 mt-1.5 w-56 overflow-hidden rounded-xl border bg-white shadow-xl shadow-black/15 animate-in fade-in-0 zoom-in-95">
           <div className="border-b px-4 py-3">
-            <p className="text-sm font-medium truncate">{user.name}</p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user.email}
+            <p className="truncate text-sm font-medium text-gray-900">
+              {user.name}
             </p>
+            <p className="truncate text-xs text-gray-500">{user.email}</p>
           </div>
 
-          {/* Menu items */}
           <div className="py-1">
             <Link
               href="/account/orders"
               onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-store-accent-light hover:text-store-accent"
             >
               <ShoppingBag className="size-4" />
               My Orders
@@ -100,18 +94,17 @@ export function AuthButtons({ user }: AuthButtonsProps) {
             <Link
               href="/account/orders"
               onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-store-accent-light hover:text-store-accent"
             >
               <User className="size-4" />
               My Account
             </Link>
           </div>
 
-          {/* Logout */}
           <div className="border-t py-1">
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+              className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
             >
               <LogOut className="size-4" />
               Sign Out
