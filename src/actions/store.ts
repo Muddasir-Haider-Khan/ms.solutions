@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 import { authOptions } from "@/lib/auth";
 import {
   OrderStatus,
@@ -76,6 +77,11 @@ const placeOrderSchema = z.object({
   shippingCity: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   paymentMethod: z.string().default("COD"),
+  guestItems: z.array(z.object({
+    productId: z.string(),
+    variantId: z.string().nullable().optional(),
+    quantity: z.number().int().positive()
+  })).optional(),
 });
 
 const getOrderSchema = z.object({
@@ -335,7 +341,7 @@ export async function addToCart(data: {
     };
   }
 
-  const { productId, variantId, quantity } = parsed.data;
+  const { productId, variantId, quantity = 1 } = parsed.data;
 
   // Verify product exists and is active
   const product = await prisma.product.findUnique({
@@ -637,6 +643,7 @@ export async function placeOrder(data: {
   shippingCity?: string | null;
   notes?: string | null;
   paymentMethod?: string;
+  guestItems?: Array<{ productId: string; variantId?: string | null; quantity: number }>;
 }) {
   const parsed = placeOrderSchema.safeParse(data);
   if (!parsed.success) {
@@ -677,6 +684,13 @@ export async function placeOrder(data: {
             quantity: item.quantity,
           }));
         }
+      } else if (validated.guestItems && validated.guestItems.length > 0) {
+         cartItems = validated.guestItems.map(item => ({
+            id: "guest-" + Math.random(),
+            productId: item.productId,
+            variantId: item.variantId ?? null,
+            quantity: item.quantity
+         }));
       }
 
       if (cartItems.length === 0) {
@@ -858,9 +872,11 @@ export async function placeOrder(data: {
       for (const item of resolvedItems) {
         if (!item.trackInventory) continue;
 
-        const systemUserId = user?.id;
+        let systemUserId = user?.id;
         if (!systemUserId) {
-          throw new Error("Cannot record inventory: no authenticated user.");
+          const sysAdmin = await tx.user.findFirst({ where: { role: "SUPER_ADMIN" } });
+          if (!sysAdmin) throw new Error("No system admin configured for guest transaction.");
+          systemUserId = sysAdmin.id;
         }
 
         if (item.variantId) {
@@ -910,7 +926,7 @@ export async function placeOrder(data: {
               afterQuantity,
               referenceType: "order",
               referenceId: order.id,
-              notes: `Order ${orderNumber} - variant stock deduction`,
+              notes: `Order ${orderNumber} - variant stock deduction (Guest checkout handled via system)`,
               productId: item.productId,
               variantId: item.variantId,
               createdById: systemUserId,
@@ -949,7 +965,7 @@ export async function placeOrder(data: {
               afterQuantity,
               referenceType: "order",
               referenceId: order.id,
-              notes: `Order ${orderNumber} - stock deduction`,
+              notes: `Order ${orderNumber} - stock deduction (Guest checkout handled via system)`,
               productId: item.productId,
               createdById: systemUserId,
             },
@@ -972,6 +988,53 @@ export async function placeOrder(data: {
     revalidatePath("/store/cart");
     revalidatePath("/store/checkout");
 
+    let jazzcashPayload: Record<string, string> | undefined = undefined;
+
+    if (validated.paymentMethod === "JAZZCASH") {
+      const salt = process.env.JAZZCASH_INTEGRITY_SALT || "";
+      const now = new Date();
+      now.setHours(now.getHours() + 5); // PKT timezone adjustment roughly
+      const txnDateTime = now.toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+      
+      const expiry = new Date(now.getTime() + 1 * 60 * 60 * 1000);
+      const txnExpiryDateTime = expiry.toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+
+      jazzcashPayload = {
+        pp_Version: "1.1",
+        pp_TxnType: "MWALLET",
+        pp_Language: "EN",
+        pp_MerchantID: process.env.JAZZCASH_MERCHANT_ID || "",
+        pp_SubMerchantID: "",
+        pp_Password: process.env.JAZZCASH_PASSWORD || "",
+        pp_BankID: "TBANK",
+        pp_ProductID: "RETL",
+        pp_TxnRefNo: result.orderNumber.replace(/[^a-zA-Z0-9]/g, "").substring(0, 20),
+        pp_Amount: Math.round(result.totalAmount * 100).toString(),
+        pp_TxnCurrency: "PKR",
+        pp_TxnDateTime: txnDateTime,
+        pp_BillReference: `billRec${result.orderNumber.substring(0, 10)}`,
+        pp_Description: `Order ${result.orderNumber}`,
+        pp_TxnExpiryDateTime: txnExpiryDateTime,
+        pp_ReturnURL: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/payment/jazzcash`,
+        pp_SecureHash: "",
+        ppmpf_1: "1",
+        ppmpf_2: "2",
+        ppmpf_3: "3",
+        ppmpf_4: "4",
+        ppmpf_5: "5",
+      };
+
+      const sortedKeys = Object.keys(jazzcashPayload)
+        .filter((k) => k !== "pp_SecureHash" && jazzcashPayload![k] !== "")
+        .sort();
+
+      const valuesString = sortedKeys.map((k) => jazzcashPayload![k]).join("&");
+      const stringToHash = `${salt}&${valuesString}`;
+
+      const hash = crypto.createHmac("sha256", salt).update(stringToHash).digest("hex").toUpperCase();
+      jazzcashPayload.pp_SecureHash = hash;
+    }
+
     return {
       success: true,
       data: {
@@ -979,6 +1042,7 @@ export async function placeOrder(data: {
         orderNumber: result.orderNumber,
         totalAmount: result.totalAmount,
         status: result.status,
+        jazzcashPayload,
       },
     };
   } catch (error) {

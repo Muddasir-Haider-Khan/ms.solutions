@@ -14,5 +14,6 @@ export default async function OrderDetailPage({
     notFound();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <OrderDetailClient order={result.data as any} />;
 }

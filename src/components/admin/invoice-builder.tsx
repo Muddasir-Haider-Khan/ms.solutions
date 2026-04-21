@@ -255,30 +255,126 @@ export function InvoiceBuilder({ customers, products }: InvoiceBuilderProps) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    // Use dynamic import for pdf client-side usage
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.text("INVOICE", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+    if (dueDate) {
+       doc.text(`Due Date: ${new Date(dueDate).toLocaleDateString()}`, 14, 35);
+    }
+
+    // Bill To
+    if (billToName || billToCompany) {
+      doc.setFontSize(12);
+      doc.text("Bill To:", 14, 45);
+      doc.setFontSize(10);
+      let y = 50;
+      if (billToName) { doc.text(billToName, 14, y); y += 5; }
+      if (billToCompany) { doc.text(billToCompany, 14, y); y += 5; }
+      if (billToAddress) { doc.text(billToAddress.split("\n")[0], 14, y); y += 5; }
+      if (billToPhone) { doc.text(`Phone: ${billToPhone}`, 14, y); y += 5; }
+      if (billToEmail) { doc.text(`Email: ${billToEmail}`, 14, y); y += 5; }
+    }
+
+    const validItems = items.filter((item) => item.name.trim() && item.quantity > 0);
+
+    const tableColumn = ["Item", "Description", "Qty", "Price", "Tax %", "Disc %", "Total"];
+    const tableRows = validItems.map(item => {
+        const base = item.quantity * item.unitPrice;
+        const disc = base * (item.discount / 100);
+        const afterDisc = base - disc;
+        const tax = afterDisc * (item.taxRate / 100);
+        const total = afterDisc + tax;
+        
+        return [
+            item.name,
+            item.description || "",
+            item.quantity.toString(),
+            formatCurrency(item.unitPrice),
+            `${item.taxRate}%`,
+            `${item.discount}%`,
+            formatCurrency(total)
+        ];
+    });
+
+    autoTable(doc, {
+      startY: 80,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: { fillColor: [24, 127, 244] }, // Apple/Brand blue (#187ff4)
+      styles: { fontSize: 9 }
+    });
+
+    // @ts-expect-error - jspdf-autotable adds lastAutoTable property
+    const finalY = doc.lastAutoTable.finalY + 10;
+    
+    doc.setFontSize(10);
+    doc.text(`Subtotal: ${formatCurrency(calculations.subtotal)}`, 140, finalY);
+    if (calculations.totalDiscount > 0) {
+      doc.text(`Discount: -${formatCurrency(calculations.totalDiscount)}`, 140, finalY + 5);
+    }
+    if (calculations.totalTax > 0) {
+      doc.text(`Tax: ${formatCurrency(calculations.totalTax)}`, 140, finalY + 10);
+    }
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Grand Total: ${formatCurrency(calculations.grandTotal)}`, 140, finalY + 20);
+
+    if (notes) {
+       doc.setFontSize(10);
+       doc.setFont("helvetica", "normal");
+       doc.text("Notes:", 14, finalY + 30);
+       doc.text(notes.substring(0, 100), 14, finalY + 35);
+    }
+    
+    doc.save(`Invoice_${Date.now()}.pdf`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          render={<Link href="/invoices" />}
-        >
-          <ArrowLeft className="size-4" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Create Invoice
-          </h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+        <div className="flex flex-1 items-center gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            render={<Link href="/invoices" />}
+          >
+            <ArrowLeft className="size-4" />
+          </Button>
+          <h1 className="text-2xl font-bold tracking-tight">Create Invoice</h1>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Desktop Actions */}
+        <div className="hidden sm:flex items-center gap-2">
           <Button
             type="button"
             variant="outline"
             render={<Link href="/invoices" />}
           >
             Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={handleDownloadPDF}
+            className="border-primary text-primary hover:bg-primary/5"
+          >
+             <FileText className="size-4" />
+             Download PDF
           </Button>
           <Button
             type="button"
@@ -295,6 +391,7 @@ export function InvoiceBuilder({ customers, products }: InvoiceBuilderProps) {
           </Button>
           <Button
             type="button"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm font-medium"
             disabled={isSubmitting}
             onClick={() => handleSubmit(true)}
           >
@@ -717,6 +814,35 @@ export function InvoiceBuilder({ customers, products }: InvoiceBuilderProps) {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Mobile Sticky Action Bar */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#D5D9D9] p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-2 pb-safe">
+         <Button
+            type="button"
+            variant="outline"
+            className="flex-1 text-[#0F1111] border-[#D5D9D9] bg-white h-10"
+            onClick={handleDownloadPDF}
+         >
+           PDF
+         </Button>
+         <Button
+            type="button"
+            variant="outline"
+            className="flex-1 bg-white h-10 border-[#007185] text-[#007185] hover:bg-[#F0F2F2]"
+            onClick={() => handleSubmit(false)}
+            disabled={isSubmitting}
+         >
+           Draft
+         </Button>
+         <Button
+            type="button"
+            className="flex-[1.5] bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] h-10 font-normal border border-[#FCD200]/50"
+            onClick={() => handleSubmit(true)}
+            disabled={isSubmitting}
+         >
+           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Finalize"}
+         </Button>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   Truck,
   Shield,
   RotateCcw,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -89,147 +90,181 @@ export default async function ProductDetailPage({
         <span className="text-foreground">{product.name}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Product Images */}
-        <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
-            {mainImage ? (
-              <img
-                src={mainImage.url}
-                alt={mainImage.altText || product.name}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center">
-                <Package className="size-24 text-muted-foreground/30" />
-              </div>
-            )}
-            {product.comparePrice &&
-              product.comparePrice > product.sellingPrice && (
-                <Badge
-                  variant="destructive"
-                  className="absolute right-3 top-3"
-                >
-                  -
-                  {Math.round(
-                    ((product.comparePrice - product.sellingPrice) /
-                      product.comparePrice) *
-                      100
-                  )}
-                  % OFF
-                </Badge>
-              )}
-          </div>
-
-          {/* Thumbnail Gallery */}
+      <div className="flex flex-col lg:flex-row gap-6 mt-4">
+        {/* Left Column: Product Images (approx 40%) */}
+        <div className="w-full lg:w-[40%] flex gap-4">
+          {/* Thumbnails (vertical on desktop) */}
           {product.images && product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="hidden md:flex flex-col gap-2 w-12 shrink-0">
               {product.images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/10"
+                  className="relative aspect-square cursor-pointer overflow-hidden rounded-sm border border-transparent hover:border-[#FF9900] shadow-[0_0_2px_rgba(0,0,0,0.15)]"
                 >
                   <img
                     src={image.url}
                     alt={image.altText || `${product.name} ${index + 1}`}
-                    className="size-full object-cover"
+                    className="size-full object-contain mix-blend-multiply"
                   />
                 </div>
               ))}
             </div>
           )}
-        </div>
 
-        {/* Product Info */}
-        <div className="flex flex-col">
-          {product.category && (
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {product.category.name}
-            </p>
-          )}
-
-          <h1 className="mt-1 text-2xl font-bold md:text-3xl">
-            {product.name}
-          </h1>
-
-          {product.brand && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Brand: <span className="font-medium">{product.brand}</span>
-            </p>
-          )}
-
-          <div className="mt-2 flex items-center gap-1">
-            <span className="text-xs text-muted-foreground">SKU:</span>
-            <span className="text-xs font-mono text-muted-foreground">
-              {product.sku}
-            </span>
-          </div>
-
-          {/* Price */}
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-primary">
-              {formatCurrency(product.sellingPrice)}
-            </span>
+          {/* Main Image */}
+          <div className="relative flex-1 aspect-square bg-[#F8F8F8] p-4 flex items-center justify-center">
+            {mainImage ? (
+              <img
+                src={mainImage.url}
+                alt={mainImage.altText || product.name}
+                className="max-h-full max-w-full object-contain mix-blend-multiply"
+              />
+            ) : (
+              <Package className="size-24 text-muted-foreground/30" />
+            )}
             {product.comparePrice &&
               product.comparePrice > product.sellingPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  {formatCurrency(product.comparePrice)}
-                </span>
+                <div className="absolute right-0 top-0 bg-[#CC0C39] text-white text-[12px] px-2 py-1 font-bold rounded-bl-md">
+                  {Math.round(
+                    ((product.comparePrice - product.sellingPrice) /
+                      product.comparePrice) *
+                      100
+                  )}
+                  % off
+                </div>
               )}
           </div>
+        </div>
 
-          {/* Stock Status */}
-          <div className="mt-3">
-            {product.quantityInStock > 0 ? (
-              <Badge variant="secondary" className="gap-1">
-                <span className="size-1.5 rounded-full bg-green-500" />
-                In Stock ({product.quantityInStock} available)
-              </Badge>
-            ) : (
-              <Badge variant="destructive" className="gap-1">
-                <span className="size-1.5 rounded-full bg-destructive" />
-                Out of Stock
-              </Badge>
+        {/* Center Column: Product Info (approx 35%) */}
+        <div className="w-full lg:w-[35%] flex flex-col pt-1">
+          <h1 className="text-[24px] font-medium leading-[1.3] text-[#0F1111]">
+            {product.name}
+          </h1>
+          {product.brand && (
+            <Link href={`/shop?brand=${product.brand}`} className="text-[14px] text-[#007185] hover:text-[#C7511F] hover:underline mt-1">
+              Visit the {product.brand} Store
+            </Link>
+          )}
+          
+          <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-1">
+              <span className="text-[14px] text-[#FFA41C]">★★★★☆</span>
+              <span className="text-[#007185] text-[14px] hover:underline cursor-pointer">
+                128 ratings
+              </span>
+            </div>
+            <span className="text-[14px] text-[#007185] hover:underline cursor-pointer">Search this page</span>
+          </div>
+
+          <Separator className="my-3 bg-[#D5D9D9]" />
+
+          {/* Price Block */}
+          <div className="flex flex-col gap-1">
+            {product.comparePrice && product.comparePrice > product.sellingPrice && (
+              <div className="flex items-center gap-2">
+                <span className="text-[24px] text-[#CC0C39] whitespace-nowrap leading-none mt-1">
+                 -{Math.round(((product.comparePrice - product.sellingPrice) / product.comparePrice) * 100)}%
+                </span>
+                <div className="flex items-baseline gap-[2px]">
+                  <span className="text-[13px] text-[#0F1111] relative -top-[8px]">Rs.</span>
+                  <span className="text-[28px] font-medium text-[#0F1111] leading-none">
+                    {product.sellingPrice.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+            {!product.comparePrice || product.comparePrice <= product.sellingPrice ? (
+              <div className="flex items-baseline gap-[2px]">
+                <span className="text-[13px] text-[#0F1111] relative -top-[8px]">Rs.</span>
+                <span className="text-[28px] font-medium text-[#0F1111] leading-none">
+                  {product.sellingPrice.toLocaleString()}
+                </span>
+              </div>
+            ) : null}
+
+            {product.comparePrice && product.comparePrice > product.sellingPrice && (
+              <div className="text-[12px] text-[#565959] mt-[2px] flex items-center gap-1">
+                Typical price: <span className="line-through">Rs. {product.comparePrice.toLocaleString()}</span>
+              </div>
             )}
           </div>
 
-          <Separator className="my-4" />
+          {/* Tax info */}
+          <div className="text-[14px] text-[#0F1111] mt-2">
+            Inclusive of all taxes.
+          </div>
+          
+          <Separator className="my-4 bg-[#D5D9D9]" />
+
+          {/* Extra generic specs */}
+          <div className="grid grid-cols-[120px_1fr] gap-2 text-[14px] text-[#0F1111] mb-2">
+            <span className="font-bold">SKU</span>
+            <span className="font-mono text-xs">{product.sku}</span>
+          </div>
+
+          <Separator className="my-4 bg-[#D5D9D9]" />
 
           {/* Description */}
-          {product.shortDescription && (
-            <p className="text-sm text-muted-foreground">
-              {product.shortDescription}
-            </p>
-          )}
-
-          {product.description && (
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold">Description</h3>
-              <div className="mt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+          <div className="text-[14px] text-[#0F1111] space-y-4">
+            <h3 className="font-bold text-[16px]">About this item</h3>
+            {product.shortDescription && (
+              <ul className="list-disc pl-5 space-y-2">
+                <li>{product.shortDescription}</li>
+              </ul>
+            )}
+            {product.description && (
+              <div className="whitespace-pre-line leading-relaxed">
                 {product.description}
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
 
-          <Separator className="my-4" />
-
-          {/* Add to Cart section - Client Component */}
-          <ProductDetailClient product={product} isAuthenticated={!!session?.user} />
-
-          {/* Trust badges */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <Truck className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Fast Delivery</span>
+        {/* Right Column: Buy Box (approx 25%) */}
+        <div className="w-full lg:w-72 lg:min-w-[280px]">
+          <div className="border border-[#D5D9D9] rounded-lg p-4 bg-white">
+            <div className="flex items-baseline gap-[2px] mb-2">
+               <span className="text-[12px] text-[#0F1111] relative -top-[4px]">Rs.</span>
+               <span className="text-[24px] font-medium text-[#0F1111] leading-none">
+                 {product.sellingPrice.toLocaleString()}
+               </span>
             </div>
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <Shield className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Secure Payment</span>
+
+            <div className="text-[14px] text-[#0F1111] leading-snug mb-4">
+              <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">FREE Returns</span>
             </div>
-            <div className="flex flex-col items-center gap-1 rounded-lg border p-3 text-center">
-              <RotateCcw className="size-5 text-primary" />
-              <span className="text-[10px] font-medium">Easy Returns</span>
+
+            <div className="flex gap-2 items-start mt-2">
+               <MapPin className="size-[16px] text-[#0F1111] shrink-0 mt-[2px]" />
+               <span className="text-[13px] text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer leading-tight">
+                 Deliver to Pakistan
+               </span>
+            </div>
+            
+            <h2 className="text-[18px] font-medium text-[#007600] mt-4 mb-2">
+              {product.quantityInStock > 0 ? "In Stock" : <span className="text-[#B12704]">Currently unavailable.</span>}
+            </h2>
+
+            <ProductDetailClient product={product} isAuthenticated={!!session?.user} />
+
+            <div className="mt-4 space-y-2 text-[12px] text-[#565959]">
+              <div className="grid grid-cols-[100px_1fr]">
+                <span>Payment</span>
+                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Secure transaction</span>
+              </div>
+              <div className="grid grid-cols-[100px_1fr]">
+                <span>Ships from</span>
+                <span>Multi Solutions</span>
+              </div>
+              <div className="grid grid-cols-[100px_1fr]">
+                <span>Sold by</span>
+                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Multi Solutions</span>
+              </div>
+              <div className="grid grid-cols-[100px_1fr]">
+                <span>Returns</span>
+                <span className="text-[#007185] hover:text-[#C7511F] hover:underline cursor-pointer">Eligible for Return</span>
+              </div>
             </div>
           </div>
         </div>

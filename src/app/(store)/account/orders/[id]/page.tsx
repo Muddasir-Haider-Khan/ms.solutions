@@ -92,6 +92,7 @@ export default async function CustomerOrderDetailPage({
     notFound();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const order = result.data as any;
   const currentStatusIndex = statusFlow.indexOf(order.status);
   const isCancelled = order.status === "CANCELLED";

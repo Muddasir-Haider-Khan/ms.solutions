@@ -68,7 +68,7 @@ export function GuestCartProvider({ children }: { children: ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          setItems(parsed);
+          setTimeout(() => setItems(parsed), 0);
         }
       }
     } catch {

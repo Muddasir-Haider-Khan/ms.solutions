@@ -245,7 +245,7 @@ export function ShopClient({
             step={500}
             value={sliderValue}
             minStepsBetweenValues={1}
-            onValueChange={(val: any) => handleSliderChange(val)}
+            onValueChange={(val: number[]) => handleSliderChange(val)}
             className="w-full"
           />
           <div className="flex items-center justify-between font-medium">
@@ -457,103 +457,73 @@ export function ShopClient({
           {products && products.products.length > 0 ? (
             <>
               <div
-                className={`grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 ${isPending ? "opacity-60" : ""}`}
+                className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 ${isPending ? "opacity-50" : "transition-opacity duration-300"}`}
               >
                 {products.products.map((product) => (
-                  <Card
+                  <div
                     key={product.id}
-                    className="group h-full overflow-hidden transition-all hover:shadow-md hover:ring-1 hover:ring-primary/20"
+                    className="group relative flex flex-col overflow-hidden bg-card rounded-[2rem] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out h-[450px]"
                   >
-                    <Link href={`/shop/${product.slug}`}>
-                      <div className="relative aspect-square overflow-hidden bg-muted">
-                        {product.images && product.images.length > 0 ? (
-                          <img
-                            src={product.images[0].url}
-                            alt={
-                              product.images[0].altText || product.name
-                            }
-                            className="size-full object-cover transition-transform group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="flex size-full items-center justify-center">
-                            <Package className="size-12 text-muted-foreground/40" />
-                          </div>
-                        )}
-                        {product.featured && (
-                          <Badge className="absolute left-2 top-2 text-[10px]">
-                            Featured
-                          </Badge>
-                        )}
-                        {product.comparePrice &&
-                          product.comparePrice > product.sellingPrice && (
-                            <Badge
-                              variant="destructive"
-                              className="absolute right-2 top-2 text-[10px]"
-                            >
-                              -
-                              {Math.round(
-                                ((product.comparePrice - product.sellingPrice) /
-                                  product.comparePrice) *
-                                  100
-                              )}
-                              %
-                            </Badge>
-                          )}
+                    <Link href={`/shop/${product.slug}`} className="flex flex-col flex-1 z-10 relative">
+                      {product.comparePrice && product.comparePrice > product.sellingPrice && (
+                        <span className="text-[11px] font-semibold text-[#ff3b30] uppercase tracking-wider mb-2">
+                          Save {Math.round(((product.comparePrice - product.sellingPrice) / product.comparePrice) * 100)}%
+                        </span>
+                      )}
+                      {product.featured && !product.comparePrice && (
+                        <span className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2">
+                          Featured
+                        </span>
+                      )}
+                      
+                      <h3 className="text-xl font-semibold leading-tight text-foreground mt-1 line-clamp-2">
+                        {product.name}
+                      </h3>
+
+                      <div className="mt-3 flex items-baseline gap-[2px]">
+                        <span className="text-sm text-foreground">Rs.</span>
+                        <span className="text-xl font-medium text-foreground">
+                          {product.sellingPrice.toLocaleString()}
+                        </span>
                       </div>
                     </Link>
-                    <CardContent className="p-3">
-                      {product.category && (
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                          {product.category.name}
-                        </p>
+
+                    {/* Image floats absolutely in the background like the homepage */}
+                    <Link href={`/shop/${product.slug}`} className="absolute bottom-[20%] left-1/2 -translate-x-1/2 w-[85%] h-[50%] flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-2 pointer-events-none">
+                      {product.images && product.images.length > 0 ? (
+                        <img
+                          src={product.images[0].url}
+                          alt={product.images[0].altText || product.name}
+                          className="max-h-full object-contain mix-blend-multiply drop-shadow-xl"
+                        />
+                      ) : (
+                        <Package className="size-24 text-muted-foreground/20" />
                       )}
-                      <Link href={`/shop/${product.slug}`}>
-                        <h3 className="mt-0.5 line-clamp-2 text-sm font-medium leading-tight hover:text-primary">
-                          {product.name}
-                        </h3>
-                      </Link>
-                      {product.shortDescription && (
-                        <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-                          {product.shortDescription}
-                        </p>
+                    </Link>
+
+                    <div className="z-10 mt-auto flex items-center gap-2 w-full pt-4">
+                      {product.quantityInStock > 0 ? (
+                        <Button
+                          className="w-full rounded-full h-11 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-semibold transition-colors duration-300 shadow-none border-none group-hover:shadow-lg group-hover:shadow-primary/20"
+                          disabled={addingToCart === product.id}
+                          onClick={(e) => {
+                             e.preventDefault();
+                             e.stopPropagation();
+                             handleAddToCart(product);
+                          }}
+                        >
+                          {addingToCart === product.id ? "Adding..." : "Add to cart"}
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full rounded-full h-11 bg-muted/50 text-muted-foreground font-semibold shadow-none cursor-not-allowed"
+                          disabled
+                        >
+                          Out of stock
+                        </Button>
                       )}
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-sm font-bold text-primary">
-                          {formatCurrency(product.sellingPrice)}
-                        </span>
-                        {product.comparePrice &&
-                          product.comparePrice > product.sellingPrice && (
-                            <span className="text-xs text-muted-foreground line-through">
-                              {formatCurrency(product.comparePrice)}
-                            </span>
-                          )}
-                      </div>
-                      <div className="mt-2">
-                        {product.quantityInStock > 0 ? (
-                          <Button
-                            size="xs"
-                            className="w-full"
-                            disabled={addingToCart === product.id}
-                            onClick={() => handleAddToCart(product)}
-                          >
-                            <ShoppingCart className="size-3" />
-                            {addingToCart === product.id
-                              ? "Adding..."
-                              : "Add to Cart"}
-                          </Button>
-                        ) : (
-                          <Button
-                            size="xs"
-                            variant="outline"
-                            className="w-full"
-                            disabled
-                          >
-                            Out of Stock
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
 

@@ -1,5 +1,4 @@
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 
 const ALLOWED_IMAGE_TYPES = [
@@ -24,20 +23,17 @@ export async function uploadFile(
     throw new Error("File size exceeds 5MB limit");
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
   const ext = file.name.split(".").pop() || "png";
-  const uniqueName = `${randomUUID()}.${ext}`;
+  const uniqueName = `${category}/${randomUUID()}.${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", category);
-  await mkdir(uploadDir, { recursive: true });
-
-  const filePath = path.join(uploadDir, uniqueName);
-  await writeFile(filePath, buffer);
+  // Use Vercel Blob for storage
+  const blob = await put(uniqueName, file, {
+    access: "public",
+    addRandomSuffix: false, // We're already making it unique
+  });
 
   return {
-    url: `/uploads/${category}/${uniqueName}`,
+    url: blob.url,
     filename: file.name,
     mimetype: file.type,
     size: file.size,
