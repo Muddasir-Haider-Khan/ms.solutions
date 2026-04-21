@@ -13,7 +13,7 @@ export default async function AccountPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/login?callbackUrl=/account");
+    redirect("/customer-login?callbackUrl=/account");
   }
 
   const accountLinks = [
