@@ -98,7 +98,7 @@ export function AuthButtons({ user }: AuthButtonsProps) {
               My Orders
             </Link>
             <Link
-              href="/account/orders"
+              href="/account"
               onClick={() => setDropdownOpen(false)}
               className="flex items-center gap-2.5 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >

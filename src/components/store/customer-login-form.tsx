@@ -10,7 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export function CustomerLoginForm() {
+import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
+
+export function CustomerLoginForm({ existingSession }: { existingSession?: Session | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -21,6 +24,42 @@ export function CustomerLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  if (existingSession?.user) {
+    const role = (existingSession.user as { role?: string }).role || "CUSTOMER";
+    const isAdmin = ["SUPER_ADMIN", "ADMIN", "STAFF"].includes(role);
+
+    return (
+      <Card className="border-0 shadow-xl shadow-black/5">
+        <CardHeader className="space-y-1 pb-4">
+          <CardTitle className="text-xl">Already Signed In</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            You are currently signed in to your account.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-xl bg-primary/5 p-4 text-sm text-muted-foreground border border-primary/10">
+            <p>Signed in as:</p>
+            <p className="mt-1 font-medium text-foreground">{existingSession.user.email}</p>
+            <p className="mt-1 text-xs opacity-70">Account Type: {role}</p>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <Button onClick={() => router.push(isAdmin ? "/dashboard" : "/")} className="w-full">
+              {isAdmin ? "Go to Admin Dashboard" : "Continue Shopping"}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => signOut({ callbackUrl: "/customer-login" })} 
+              className="w-full border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
+            >
+              Sign Out
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
