@@ -12,12 +12,6 @@ export const metadata = {
 
 export default async function CustomerLoginPage() {
   const session = await getServerSession(authOptions);
-  if (session?.user) {
-    const role = (session.user as { role: string }).role;
-    const isAdmin = ["SUPER_ADMIN", "ADMIN", "STAFF"].includes(role);
-    redirect(isAdmin ? "/dashboard" : "/");
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-white to-primary/5">
       {/* Decorative elements */}
@@ -33,7 +27,7 @@ export default async function CustomerLoginPage() {
         </div>
 
         {/* Login Form */}
-        <CustomerLoginForm />
+        <CustomerLoginForm existingSession={session} />
 
         {/* Back to store */}
         <p className="mt-6 text-center text-xs text-muted-foreground">

@@ -5,12 +5,6 @@ import { LoginForm } from "@/components/admin/login-form";
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
-  if (session?.user) {
-    const role = (session.user as { role: string }).role;
-    const isAdmin = ["SUPER_ADMIN", "ADMIN", "STAFF"].includes(role);
-    redirect(isAdmin ? "/dashboard" : "/");
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="w-full max-w-md px-4">
@@ -22,7 +16,7 @@ export default async function LoginPage() {
             Business Management System
           </p>
         </div>
-        <LoginForm />
+        <LoginForm existingSession={session} />
       </div>
     </div>
   );

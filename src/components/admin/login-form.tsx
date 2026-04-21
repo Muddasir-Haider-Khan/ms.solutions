@@ -8,14 +8,55 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 
-export function LoginForm() {
+export function LoginForm({ existingSession }: { existingSession?: Session | null }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  if (existingSession?.user) {
+    const role = (existingSession.user as { role: string }).role;
+    const isAdmin = ["SUPER_ADMIN", "ADMIN", "STAFF"].includes(role);
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Already Signed In</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-md bg-primary/5 p-4 text-sm text-muted-foreground">
+            <p>You are currently signed in as:</p>
+            <p className="mt-1 font-medium text-foreground">{existingSession.user.email}</p>
+            <p className="mt-1 text-xs">Role: {role}</p>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            {isAdmin ? (
+              <Button onClick={() => router.push("/dashboard")} className="w-full">
+                Go to Dashboard
+              </Button>
+            ) : (
+              <Button onClick={() => router.push("/")} variant="outline" className="w-full">
+                Go to Storefront
+              </Button>
+            )}
+            <Button 
+              variant="ghost" 
+              onClick={() => signOut({ callbackUrl: "/login" })} 
+              className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              Sign Out
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

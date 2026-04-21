@@ -13,7 +13,7 @@ export default async function AddressesPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/login?callbackUrl=/account/addresses");
+    redirect("/customer-login?callbackUrl=/account/addresses");
   }
 
   // Fetch customer profiles attached to this userId

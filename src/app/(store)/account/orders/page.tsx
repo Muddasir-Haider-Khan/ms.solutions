@@ -13,7 +13,7 @@ export default async function OrdersPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/login?callbackUrl=/account/orders");
+    redirect("/customer-login?callbackUrl=/account/orders");
   }
 
   // Fetch orders attached to this userId
