@@ -12,16 +12,21 @@ export function CartDrawer() {
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <div role="button" className="relative text-muted-foreground hover:text-foreground transition-colors group cursor-pointer">
-          <ShoppingBag className="size-5 font-light" strokeWidth={1.5} />
-          {totalQuantity > 0 && (
-            <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground group-hover:scale-110 transition-transform">
-              {totalQuantity}
-            </span>
-          )}
-        </div>
-      </SheetTrigger>
+      <SheetTrigger
+        render={
+          <div
+            role="button"
+            className="relative text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
+          >
+            <ShoppingBag className="size-5 font-light" strokeWidth={1.5} />
+            {totalQuantity > 0 && (
+              <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground group-hover:scale-110 transition-transform">
+                {totalQuantity}
+              </span>
+            )}
+          </div>
+        }
+      />
       <SheetContent className="w-full sm:max-w-md bg-white/80 backdrop-blur-3xl border-l border-white/20 p-0 flex flex-col">
         <div className="p-6 border-b border-gray-100/50">
           <SheetHeader className="flex flex-row items-center justify-between">
